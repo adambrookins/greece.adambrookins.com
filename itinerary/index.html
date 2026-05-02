@@ -7,6 +7,60 @@
   <title>Full Itinerary · Grecian Gusts 2026</title>
   <link rel="stylesheet" href="/shared.css" />
   <style>
+
+    /* ── PARTY PATH LEGEND ── */
+    .paths-legend {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      margin-bottom: 32px;
+      padding: 18px 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+    .paths-legend-label {
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--text-muted);
+      width: 100%; margin-bottom: 4px;
+    }
+    .path-chip {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 6px 12px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 700;
+      border: 1.5px solid;
+    }
+    .path-chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .path-chip.path-a { background: rgba(26,79,138,0.08); border-color: rgba(26,79,138,0.3); color: var(--navy); }
+    .path-chip.path-a .dot { background: var(--navy); }
+    .path-chip.path-b { background: rgba(212,134,10,0.08); border-color: rgba(212,134,10,0.3); color: var(--gold); }
+    .path-chip.path-b .dot { background: var(--gold); }
+    .path-chip.path-c { background: rgba(46,125,79,0.08); border-color: rgba(46,125,79,0.3); color: var(--green); }
+    .path-chip.path-c .dot { background: var(--green); }
+
+    /* ── SPLIT BANNER ── */
+    .split-banner {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px; border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 0.8rem; font-weight: 700;
+    }
+    .split-banner.split-start {
+      background: rgba(26,79,138,0.06);
+      border: 1.5px dashed rgba(26,79,138,0.3);
+      color: var(--navy);
+    }
+    .split-banner.split-rejoin {
+      background: rgba(46,125,79,0.06);
+      border: 1.5px dashed rgba(46,125,79,0.3);
+      color: var(--green);
+    }
+    .split-banner.split-end {
+      background: rgba(212,134,10,0.06);
+      border: 1.5px dashed rgba(212,134,10,0.3);
+      color: #7a4a00;
+    }
+
+    /* ── PHASE BLOCKS ── */
     .phase-block { margin-bottom: 48px; }
     .phase-label {
       display: flex; align-items: center; gap: 12px;
@@ -17,19 +71,22 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 1.2rem; flex-shrink: 0;
     }
-    .phase-icon.athens { background: var(--gold-pale); border: 1px solid rgba(212,134,10,0.3); }
+    .phase-icon.athens  { background: var(--gold-pale); border: 1px solid rgba(212,134,10,0.3); }
     .phase-icon.sailing { background: var(--navy-pale); border: 1px solid rgba(26,79,138,0.3); }
-    .phase-icon.italy { background: var(--gold-pale); border: 1px solid rgba(212,134,10,0.3); }
-
-    .phase-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem; font-weight: 700; color: var(--text);
-    }
+    .phase-icon.italy   { background: var(--gold-pale); border: 1px solid rgba(212,134,10,0.3); }
+    .phase-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: var(--text); }
     .phase-dates { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
 
+    /* ── DAY ROWS ── */
     .day-row {
-      background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 10px; box-shadow: var(--shadow);
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden; margin-bottom: 10px;
+      box-shadow: var(--shadow);
     }
+    .day-row.path-a-row { border-left: 3px solid var(--navy); }
+    .day-row.path-b-row { border-left: 3px solid var(--gold); }
+    .day-row.path-c-row { border-left: 3px solid var(--green); }
+
     .day-row-header {
       display: grid;
       grid-template-columns: 100px 1fr;
@@ -39,18 +96,14 @@
       background: var(--bg2);
       border-right: 1px solid var(--border);
       padding: 14px 16px;
-      display: flex; flex-direction: column;
-      justify-content: center;
+      display: flex; flex-direction: column; justify-content: center;
     }
-    .day-row-weekday { font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+    .day-row-weekday  { font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
     .day-row-date-num { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--text); line-height: 1; }
-    .day-row-month { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+    .day-row-month    { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
     .day-row-main { padding: 14px 18px; }
-    .day-row-location {
-      font-size: 0.63rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 3px;
-    }
-    .day-row-title { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .day-row-location { font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 3px; }
+    .day-row-title { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
     .day-row-items { display: flex; flex-direction: column; gap: 4px; }
     .day-item {
       display: flex; align-items: flex-start; gap: 8px;
@@ -61,19 +114,73 @@
       font-size: 0.7rem; color: var(--text-muted);
       flex-shrink: 0; min-width: 48px;
     }
-    .day-item.warn .day-item-time { color: var(--red); }
+    .day-item.warn .day-item-time    { color: var(--red); }
     .day-item.warn .day-item-content { color: #7a2000; }
-    .day-item.good .day-item-time { color: var(--green); }
+    .day-item.good .day-item-time    { color: var(--green); }
     .day-item.good .day-item-content { color: #1a5c35; }
     .day-item-content strong { color: var(--text); }
 
+    /* ── BADGES ── */
     .conf-badge {
       display: inline-flex; align-items: center; gap: 5px;
-      background: var(--green-pale); border: 1px solid rgba(46,125,79,0.3); color: var(--green); font-size: 0.65rem; font-weight: 700;
+      background: var(--green-pale); border: 1px solid rgba(46,125,79,0.3); color: var(--green);
+      font-size: 0.65rem; font-weight: 700;
       padding: 2px 8px; border-radius: 8px;
       font-family: 'DM Mono', monospace; letter-spacing: 0.05em;
     }
-    .conf-badge.pending { background: #1c0a00; border-color: #7c2d12; color: #fca5a5; }
+    .conf-badge.pending { background: rgba(212,134,10,0.08); border-color: rgba(212,134,10,0.3); color: var(--gold); }
+    .conf-badge.unknown { background: #1c0a00; border-color: #7c2d12; color: #fca5a5; }
+
+    .who-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 8px;
+      font-size: 0.63rem; font-weight: 700;
+      font-family: 'DM Mono', monospace;
+    }
+    .who-badge.path-a { background: rgba(26,79,138,0.1); color: var(--navy); }
+    .who-badge.path-b { background: rgba(212,134,10,0.1); color: #7a4a00; }
+    .who-badge.path-c { background: rgba(46,125,79,0.1); color: var(--green); }
+
+    /* ── AIRBNB CARD ── */
+    .booking-card {
+      margin-top: 12px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 0.78rem;
+    }
+    .booking-card-title { font-weight: 700; color: var(--text); margin-bottom: 8px; font-size: 0.82rem; }
+    .booking-card-row {
+      display: flex; gap: 8px; align-items: flex-start;
+      color: var(--text-dim); margin-bottom: 4px;
+    }
+    .booking-card-row .lbl { font-weight: 700; color: var(--text-muted); min-width: 80px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ── COLUMNS for parallel paths ── */
+    .parallel-paths {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 620px) {
+      .parallel-paths { grid-template-columns: 1fr; }
+    }
+    .parallel-paths .day-row { margin-bottom: 0; }
+
+    /* ── 3-WAY SPLIT ── */
+    .three-paths {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 780px) {
+      .three-paths { grid-template-columns: 1fr; }
+    }
+    .three-paths .day-row { margin-bottom: 0; }
+
   </style>
 </head>
 <body>
@@ -94,101 +201,184 @@
 <div class="page-hero">
   <div class="page-hero-eyebrow">Jun 10–23, 2026 · Full Trip Timeline</div>
   <h1>The <em>Itinerary</em></h1>
-  <p>Minneapolis → Athens → Corfu → Ionian Islands → Bologna → Milan → Minneapolis. 13 days, every detail.</p>
+  <p>Not everyone takes the same path. Here's every route, every flight, every split — all in one place.</p>
 </div>
 
 <div class="section">
 
-  <!-- PHASE 1: TRAVEL -->
+  <!-- LEGEND -->
+  <div class="paths-legend">
+    <div class="paths-legend-label">🗺 Party Paths — Getting There</div>
+    <div class="path-chip path-a"><div class="dot"></div> MSP — Adam · Jenny · Kathryn</div>
+    <div class="path-chip path-b"><div class="dot"></div> NYC — Nic · Fallon</div>
+    <div class="path-chip path-c"><div class="dot"></div> SEA — Dustin · Alicia</div>
+  </div>
+
+  <!-- ═══ PHASE 1: GETTING THERE ═══ -->
   <div class="phase-block">
     <div class="phase-label">
       <div class="phase-icon athens">✈️</div>
-      <div><div class="phase-title">Getting There</div><div class="phase-dates">Wed Jun 10 – Thu Jun 11</div></div>
+      <div><div class="phase-title">Getting There</div><div class="phase-dates">Wed Jun 10 – Thu Jun 12 · Two separate routes</div></div>
     </div>
 
-    <div class="day-row">
-      <div class="day-row-header">
-        <div class="day-row-date"><div class="day-row-weekday">Wed</div><div class="day-row-date-num">10</div><div class="day-row-month">Jun</div></div>
-        <div class="day-row-main">
-          <div class="day-row-location">Minneapolis → Boston → Athens</div>
-          <div class="day-row-title">Departure Day <span class="conf-badge">✓ G5ME5W</span></div>
-          <div class="day-row-items">
-            <div class="day-item warn"><div class="day-item-time">6:55 AM</div><div class="day-item-content"><strong>DL2649</strong> MSP → BOS · Seat 18D · Arrives 10:45 AM</div></div>
-            <div class="day-item"><div class="day-item-time">3:25 PM</div><div class="day-item-content"><strong>DL240</strong> BOS → ATH · Seat 7C · Overnight</div></div>
+    <div class="split-banner split-start">⛵ Three departure cities — MSP + NYC fly to Athens, SEA flies direct to Corfu</div>
+
+    <div class="three-paths">
+
+      <!-- PATH A: MSP -->
+      <div class="day-row path-a-row">
+        <div class="day-row-header" style="grid-template-columns:1fr;">
+          <div class="day-row-main">
+            <div class="day-row-location">Minneapolis → Boston → Athens</div>
+            <div class="day-row-title">
+              MSP Departure · Wed Jun 10
+              <span class="who-badge path-a">Adam · Jenny · Kathryn</span>
+              <span class="conf-badge">✓ G5ME5W</span>
+            </div>
+            <div class="day-row-items">
+              <div class="day-item warn"><div class="day-item-time">6:55 AM</div><div class="day-item-content"><strong>DL2649</strong> MSP → BOS · Seat 18D · Arrives 10:45 AM</div></div>
+              <div class="day-item"><div class="day-item-time">3:25 PM</div><div class="day-item-content"><strong>DL240</strong> BOS → ATH · Seat 7C · Overnight</div></div>
+              <div class="day-item good"><div class="day-item-time">7:35 AM</div><div class="day-item-content">Arrive ATH Thu Jun 11</div></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="day-row">
-      <div class="day-row-header">
-        <div class="day-row-date"><div class="day-row-weekday">Thu</div><div class="day-row-date-num">11</div><div class="day-row-month">Jun</div></div>
-        <div class="day-row-main">
-          <div class="day-row-location">Athens, Greece</div>
-          <div class="day-row-title">Arrive Athens · Explore Plaka <span class="conf-badge pending">BOOK Hotel</span></div>
-          <div class="day-row-items">
-            <div class="day-item"><div class="day-item-time">7:35 AM</div><div class="day-item-content"><strong>Arrive ATH.</strong> Metro Line 3 → Monastiraki (~40 min, ~€10)</div></div>
-            <div class="day-item"><div class="day-item-time">9:00 AM</div><div class="day-item-content">Check in hotel near Plaka. Drop bags. Sleep 2–3 hours.</div></div>
-            <div class="day-item"><div class="day-item-time">2:00 PM</div><div class="day-item-content">Monastiraki + Ancient Agora — flea market, street food, outdoor cafes</div></div>
-            <div class="day-item"><div class="day-item-time">4:00 PM</div><div class="day-item-content">Anafiotika — whitewashed neighbourhood hugging the Acropolis base</div></div>
-            <div class="day-item"><div class="day-item-time">7:00 PM</div><div class="day-item-content"><strong>Dinner: Scholarhio</strong> — traditional Greek small plates in Plaka. Fixed €20 menu. (Closed Tuesdays — Thursday fine.)</div></div>
-            <div class="day-item"><div class="day-item-time">9:00 PM</div><div class="day-item-content">Evening stroll in Plaka. Early night — Acropolis at 8 AM tomorrow.</div></div>
+      <!-- PATH B: NYC -->
+      <div class="day-row path-b-row">
+        <div class="day-row-header" style="grid-template-columns:1fr;">
+          <div class="day-row-main">
+            <div class="day-row-location">New York City → Athens</div>
+            <div class="day-row-title">
+              NYC Departure · Wed Jun 10
+              <span class="who-badge path-b">Nic · Fallon</span>
+              <span class="conf-badge pending">Confirm flight #</span>
+            </div>
+            <div class="day-row-items">
+              <div class="day-item"><div class="day-item-time">Jun 10</div><div class="day-item-content">Depart NYC (JFK/EWR) → ATH · Same travel day as MSP crew</div></div>
+              <div class="day-item good"><div class="day-item-time">Jun 11</div><div class="day-item-content">Arrive Athens Thu Jun 11 · Meet MSP crew at Airbnb</div></div>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- PATH C: SEA -->
+      <div class="day-row path-c-row">
+        <div class="day-row-header" style="grid-template-columns:1fr;">
+          <div class="day-row-main">
+            <div class="day-row-location">Seattle → Frankfurt → Corfu</div>
+            <div class="day-row-title">
+              SEA Departure · Thu Jun 11
+              <span class="who-badge path-c">Dustin · Alicia</span>
+              <span class="conf-badge">✓ 15562724</span>
+            </div>
+            <div class="day-row-items">
+              <div class="day-item"><div class="day-item-time">6:05 PM</div><div class="day-item-content"><strong>Condor DE2033</strong> SEA → FRA · Seat 30E · Arrives 1:10 PM Jun 12</div></div>
+              <div class="day-item"><div class="day-item-time">4:10 PM</div><div class="day-item-content"><strong>Condor DE1580</strong> FRA → CFU · Arrives 7:30 PM Jun 12</div></div>
+              <div class="day-item good"><div class="day-item-time">7:30 PM</div><div class="day-item-content"><strong>Arrive Corfu</strong> Jun 12. Check in. Rest before boarding day.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- PHASE 2: ATHENS -->
+  <!-- ═══ PHASE 2: ATHENS ═══ -->
   <div class="phase-block">
     <div class="phase-label">
       <div class="phase-icon athens">🏛</div>
-      <div><div class="phase-title">Athens — Acropolis Day</div><div class="phase-dates">Fri Jun 12</div></div>
+      <div>
+        <div class="phase-title">Athens — 5-Person Crew</div>
+        <div class="phase-dates">Thu Jun 11 – Sat Jun 13 · <span style="color:var(--navy);font-weight:700;">Adam · Jenny · Kathryn</span> (MSP) + <span style="color:var(--gold);font-weight:700;">Nic · Fallon</span> (NYC)</div>
+      </div>
     </div>
 
-    <div class="day-row">
+    <div class="day-row path-a-row">
+      <div class="day-row-header">
+        <div class="day-row-date"><div class="day-row-weekday">Thu</div><div class="day-row-date-num">11</div><div class="day-row-month">Jun</div></div>
+        <div class="day-row-main">
+          <div class="day-row-location">Athens, Greece · Koukaki</div>
+          <div class="day-row-title">Arrive Athens · Check In Airbnb <span class="conf-badge">✓ HMSMTBA9CA</span></div>
+          <div class="day-row-items">
+            <div class="day-item"><div class="day-item-time">7:35 AM</div><div class="day-item-content"><strong>Arrive ATH.</strong> Metro Line 3 → Monastiraki (~40 min, ~€10)</div></div>
+            <div class="day-item warn"><div class="day-item-time">4:00 PM</div><div class="day-item-content"><strong>Check-in opens.</strong> Drop bags earlier if host allows. Sleep 2–3 hours.</div></div>
+            <div class="day-item"><div class="day-item-time">2:00 PM</div><div class="day-item-content">Monastiraki + Ancient Agora — flea market, street food, outdoor cafes</div></div>
+            <div class="day-item"><div class="day-item-time">4:00 PM</div><div class="day-item-content">Anafiotika — whitewashed neighbourhood hugging the Acropolis base</div></div>
+            <div class="day-item"><div class="day-item-time">7:00 PM</div><div class="day-item-content"><strong>Dinner: Scholarhio</strong> — traditional Greek small plates in Plaka. Fixed €20 menu. (Thursdays fine.)</div></div>
+          </div>
+          <div class="booking-card">
+            <div class="booking-card-title">🏠 Spacious 3BR Home Near Acropolis Museum</div>
+            <div class="booking-card-row"><span class="lbl">Address</span><span>Vourvachi 3, Athina 117 43, Greece (Koukaki)</span></div>
+            <div class="booking-card-row"><span class="lbl">Host</span><span>Konstantinos · +1 647-570-3987</span></div>
+            <div class="booking-card-row"><span class="lbl">Check-in</span><span>Thu Jun 11, after 4:00 PM</span></div>
+            <div class="booking-card-row"><span class="lbl">Checkout</span><span>Sat Jun 13, by 10:00 AM</span></div>
+            <div class="booking-card-row"><span class="lbl">Guests</span><span>5 adults</span></div>
+            <div class="booking-card-row"><span class="lbl">Code</span><span>HMSMTBA9CA</span></div>
+            <div class="booking-card-row"><span class="lbl">Balance</span><span>$1,071.40 due May 29 · Free cancel before Jun 6</span></div>
+            <div class="booking-card-row"><span class="lbl">⚠️ Note</span><span>No carbon monoxide alarm — bring a portable detector</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-row path-a-row">
       <div class="day-row-header">
         <div class="day-row-date"><div class="day-row-weekday">Fri</div><div class="day-row-date-num">12</div><div class="day-row-month">Jun</div></div>
         <div class="day-row-main">
           <div class="day-row-location">Athens, Greece</div>
-          <div class="day-row-title">Acropolis Day · Last Full Day <span class="conf-badge pending">BOOK hhticket.gr</span></div>
+          <div class="day-row-title">Acropolis Day <span class="conf-badge pending">BOOK hhticket.gr</span></div>
           <div class="day-row-items">
-            <div class="day-item warn"><div class="day-item-time">7:45 AM</div><div class="day-item-content"><strong>At gate, Acropolis.</strong> €30 entry. 8 AM time slot. Book at hhticket.gr — capped at 20,000/day.</div></div>
-            <div class="day-item"><div class="day-item-time">10:30 AM</div><div class="day-item-content"><strong>Acropolis Museum</strong> — €20 entry. Parthenon friezes, Caryatids. Allow 90 min. Book at etickets.theacropolismuseum.gr.</div></div>
-            <div class="day-item"><div class="day-item-time">12:30 PM</div><div class="day-item-content">Syntagma Square — Changing of the Guard, Tomb of the Unknown Soldier (every hour on the hour)</div></div>
-            <div class="day-item"><div class="day-item-time">2:00 PM</div><div class="day-item-content">Lunch + afternoon free. Plaka shopping, rooftop bar with Acropolis view.</div></div>
-            <div class="day-item"><div class="day-item-time">6:00 PM</div><div class="day-item-content"><strong>Philopappos Hill</strong> — best sunset view in Athens. 15 min walk from Acropolis. Far fewer crowds than Lycabettus.</div></div>
-            <div class="day-item"><div class="day-item-time">7:30 PM</div><div class="day-item-content"><strong>Dinner: Aerides Plaka</strong> — grilled octopus, moussaka. Highly rated. Outdoor seating.</div></div>
-            <div class="day-item warn"><div class="day-item-time">9:30 PM</div><div class="day-item-content"><strong>Return to hotel. Alarm: 4:15 AM. Hotel departure: 5:00 AM.</strong> Flight 6:35 AM.</div></div>
+            <div class="day-item warn"><div class="day-item-time">7:45 AM</div><div class="day-item-content"><strong>At gate, Acropolis.</strong> €30 entry. 8 AM time slot. Book at hhticket.gr — capped 20,000/day.</div></div>
+            <div class="day-item"><div class="day-item-time">10:30 AM</div><div class="day-item-content"><strong>Acropolis Museum</strong> — €20 entry. Allow 90 min. Book at etickets.theacropolismuseum.gr.</div></div>
+            <div class="day-item"><div class="day-item-time">12:30 PM</div><div class="day-item-content">Syntagma Square — Changing of the Guard (every hour)</div></div>
+            <div class="day-item"><div class="day-item-time">6:00 PM</div><div class="day-item-content"><strong>Philopappos Hill</strong> — best sunset view in Athens. 15 min walk from Acropolis.</div></div>
+            <div class="day-item"><div class="day-item-time">7:30 PM</div><div class="day-item-content"><strong>Dinner: Aerides Plaka</strong> — grilled octopus, moussaka. Outdoor seating.</div></div>
+            <div class="day-item warn"><div class="day-item-time">9:30 PM</div><div class="day-item-content"><strong>Back to Airbnb. Alarm: 4:15 AM. Checkout is 10 AM — leave bags with host or early taxi.</strong></div></div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- PHASE 3: SAILING -->
-  <div class="phase-block">
-    <div class="phase-label">
-      <div class="phase-icon sailing">⛵</div>
-      <div><div class="phase-title">The Sailing Week</div><div class="phase-dates">Sat Jun 13 – Sat Jun 20</div></div>
-    </div>
-
-    <div class="day-row">
+    <div class="day-row path-a-row">
       <div class="day-row-header">
         <div class="day-row-date"><div class="day-row-weekday">Sat</div><div class="day-row-date-num">13</div><div class="day-row-month">Jun</div></div>
         <div class="day-row-main">
-          <div class="day-row-location">Athens → Corfu · Board</div>
-          <div class="day-row-title">Fly to Corfu · Board Catamaran <span class="conf-badge">✓ USJZNE</span></div>
+          <div class="day-row-location">Athens → Corfu</div>
+          <div class="day-row-title">Fly to Corfu <span class="conf-badge">✓ USJZNE</span></div>
           <div class="day-row-items">
-            <div class="day-item warn"><div class="day-item-time">5:00 AM</div><div class="day-item-content">Hotel departure for ATH airport</div></div>
+            <div class="day-item warn"><div class="day-item-time">5:00 AM</div><div class="day-item-content">Hotel departure for ATH airport. Checkout bag situation before sleeping.</div></div>
             <div class="day-item"><div class="day-item-time">6:35 AM</div><div class="day-item-content"><strong>GQ270</strong> ATH → CFU · SKY Express · Seats 2A/2B/2C · Arrives 7:50 AM</div></div>
-            <div class="day-item"><div class="day-item-time">6:00 PM</div><div class="day-item-content"><strong>Board Sunsail 454L at Kontokali, Gouvia Marina.</strong> Sign T&amp;C, provision, settle in.</div></div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="day-row">
+  </div>
+
+  <!-- ═══ PHASE 3: SAILING ═══ -->
+  <div class="phase-block">
+    <div class="phase-label">
+      <div class="phase-icon sailing">⛵</div>
+      <div><div class="phase-title">The Sailing Week</div><div class="phase-dates">Sat Jun 13 – Sat Jun 20 · All 7 aboard Grecian Gusts</div></div>
+    </div>
+
+    <div class="split-banner split-rejoin">⚓ Crew reunited — all 7 aboard at Gouvia Marina, Corfu</div>
+
+    <div class="day-row path-c-row">
+      <div class="day-row-header">
+        <div class="day-row-date"><div class="day-row-weekday">Sat</div><div class="day-row-date-num">13</div><div class="day-row-month">Jun</div></div>
+        <div class="day-row-main">
+          <div class="day-row-location">Corfu · Gouvia Marina</div>
+          <div class="day-row-title">Board Sunsail 454L · Grecian Gusts <span class="conf-badge">✓ USJZNE</span></div>
+          <div class="day-row-items">
+            <div class="day-item"><div class="day-item-time">6:00 PM</div><div class="day-item-content"><strong>Board at Kontokali, Gouvia Marina.</strong> Sign T&amp;C, provision, settle in. All crew present.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-row path-c-row">
       <div class="day-row-header">
         <div class="day-row-date"><div class="day-row-weekday">Sun–Fri</div><div class="day-row-date-num">14–19</div><div class="day-row-month">Jun</div></div>
         <div class="day-row-main">
@@ -206,72 +396,130 @@
       </div>
     </div>
 
-    <div class="day-row">
-      <div class="day-row-header">
-        <div class="day-row-date"><div class="day-row-weekday">Sat</div><div class="day-row-date-num">20</div><div class="day-row-month">Jun</div></div>
-        <div class="day-row-main">
-          <div class="day-row-location">Corfu → Bologna</div>
-          <div class="day-row-title">Off Boat · Fly to Bologna <span class="conf-badge pending">BOOK FR5155</span></div>
-          <div class="day-row-items">
-            <div class="day-item warn"><div class="day-item-time">12:15 AM</div><div class="day-item-content"><strong>Ryanair FR5155</strong> CFU → BLQ · ~$55/person · Arrives 1:00 AM BLQ</div></div>
-            <div class="day-item"><div class="day-item-time">10:00 AM</div><div class="day-item-content">Off boat. Check out of charter. Day in Corfu if energy allows.</div></div>
-            <div class="day-item"><div class="day-item-time">1:00 AM</div><div class="day-item-content">Arrive Bologna airport · Taxi ~10 min to hotel near BLQ · Sleep only.</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 
-  <!-- PHASE 4: ITALY -->
+  <!-- ═══ PHASE 4: AFTER SAILING — 3-WAY SPLIT ═══ -->
   <div class="phase-block">
     <div class="phase-label">
       <div class="phase-icon italy">🍝</div>
-      <div><div class="phase-title">The Italy Bonus Round</div><div class="phase-dates">Sat Jun 20 – Tue Jun 23</div></div>
+      <div><div class="phase-title">After Sailing — Three Ways Home</div><div class="phase-dates">Sat Jun 20 – Tue Jun 23</div></div>
     </div>
 
-    <div class="day-row">
-      <div class="day-row-header">
-        <div class="day-row-date"><div class="day-row-weekday">Sat–Sun</div><div class="day-row-date-num">20–21</div><div class="day-row-month">Jun</div></div>
-        <div class="day-row-main">
-          <div class="day-row-location">Bologna, Italy</div>
-          <div class="day-row-title">Bologna Days <span class="conf-badge pending">BOOK Airbnb</span></div>
-          <div class="day-row-items">
-            <div class="day-item"><div class="day-item-time">Day 1</div><div class="day-item-content">Check into Airbnb near/in Bologna. Explore city, food, Piazza Maggiore. Sleep after Ryanair chaos.</div></div>
-            <div class="day-item"><div class="day-item-time">Day 2</div><div class="day-item-content">Full day in Bologna. Quadrilatero food market, tortellini, aperitivo culture. Do not leave without eating.</div></div>
+    <div class="split-banner split-end">⛵ Paths diverge again — crew splits at Corfu after disembarking Jun 20</div>
+
+    <div class="three-paths">
+
+      <!-- PATH A: Bologna -->
+      <div class="day-row path-a-row">
+        <div class="day-row-header" style="grid-template-columns:1fr;">
+          <div class="day-row-main">
+            <div class="day-row-location">Bologna Route</div>
+            <div class="day-row-title">
+              Ryanair to Bologna
+              <span class="who-badge path-a">Adam · Jenny · Kathryn · Nic · Fallon</span>
+              <span class="conf-badge">✓ ET5WXI</span>
+            </div>
+            <div class="day-row-items">
+              <div class="day-item warn"><div class="day-item-time">23:45</div><div class="day-item-content"><strong>Gate closes.</strong> Jun 19 night. All 5 — be at CFU airport well before midnight.</div></div>
+              <div class="day-item warn"><div class="day-item-time">00:15</div><div class="day-item-content"><strong>Ryanair</strong> CFU → BLQ · Ref <strong>ET5WXI</strong> · Arrives 1:00 AM Jun 20</div></div>
+              <div class="day-item"><div class="day-item-time">⚠️</div><div class="day-item-content">Ryanair requires <strong>app-only boarding passes.</strong> No printed passes. Download the Ryanair app and check in online before arriving.</div></div>
+              <div class="day-item"><div class="day-item-time">1:00 AM</div><div class="day-item-content">Arrive Bologna BLQ. Taxi ~10 min to hotel. Sleep only.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PATH B: Dustin stays Corfu → Rome -->
+      <div class="day-row path-b-row">
+        <div class="day-row-header" style="grid-template-columns:1fr;">
+          <div class="day-row-main">
+            <div class="day-row-location">Corfu → Rome Route</div>
+            <div class="day-row-title">
+              Staying in Corfu
+              <span class="who-badge path-b">Dustin</span>
+            </div>
+            <div class="day-row-items">
+              <div class="day-item"><div class="day-item-time">Jun 20</div><div class="day-item-content">Off boat Jun 20. Staying in Corfu with wife through Jun 22.</div></div>
+              <div class="day-item"><div class="day-item-time">Jun 22</div><div class="day-item-content">Fly Corfu → Rome <span class="conf-badge pending">BOOK</span></div></div>
+              <div class="day-item"><div class="day-item-time">Jun 22–26</div><div class="day-item-content">Rome. Exploring.</div></div>
+              <div class="day-item warn"><div class="day-item-time">Jun 27</div><div class="day-item-content"><strong>Condor DE4438</strong> FCO 10:50 AM → FRA 12:40 PM → <strong>DE2032</strong> FRA 2:35 PM → SEA 4:00 PM · Ref 15562724</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PATH C: Alicia home from Corfu -->
+      <div class="day-row" style="border-left:3px solid #9333ea;">
+        <div class="day-row-header" style="grid-template-columns:1fr;">
+          <div class="day-row-main">
+            <div class="day-row-location">Corfu → Home Route</div>
+            <div class="day-row-title">
+              Flying Home from Corfu
+              <span class="who-badge" style="background:rgba(147,51,234,0.1);color:#7e22ce;">Alicia</span>
+            </div>
+            <div class="day-row-items">
+              <div class="day-item"><div class="day-item-time">Jun 20</div><div class="day-item-content">Off boat Jun 20. Stays in Corfu through Jun 22.</div></div>
+              <div class="day-item warn"><div class="day-item-time">Jun 22</div><div class="day-item-content"><strong>Flies out of Corfu</strong> morning of Jun 22. <span class="conf-badge unknown">Destination TBD</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOLOGNA GROUP CONTINUES -->
+    <div style="margin-top:20px;">
+      <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--navy);margin-bottom:12px;">🔵 Bologna Group Continues — Adam · Jenny · Kathryn (MSP) · Nic · Fallon (NYC) — all 5 on ET5WXI</div>
+
+      <div class="day-row path-a-row">
+        <div class="day-row-header">
+          <div class="day-row-date"><div class="day-row-weekday">Sat–Sun</div><div class="day-row-date-num">20–21</div><div class="day-row-month">Jun</div></div>
+          <div class="day-row-main">
+            <div class="day-row-location">Bologna, Italy</div>
+            <div class="day-row-title">Bologna Days <span class="conf-badge pending">BOOK Airbnb</span></div>
+            <div class="day-row-items">
+              <div class="day-item"><div class="day-item-time">Day 1</div><div class="day-item-content">Check into Airbnb. Recover from the midnight Ryanair chaos. Explore Piazza Maggiore.</div></div>
+              <div class="day-item"><div class="day-item-time">Day 2</div><div class="day-item-content">Quadrilatero food market, tortellini, aperitivo culture. Do not leave without eating everything.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="day-row path-a-row">
+        <div class="day-row-header">
+          <div class="day-row-date"><div class="day-row-weekday">Mon</div><div class="day-row-date-num">22</div><div class="day-row-month">Jun</div></div>
+          <div class="day-row-main">
+            <div class="day-row-location">Bologna → Milan</div>
+            <div class="day-row-title">Frecciarossa to Milan <span class="conf-badge pending">BOOK Train</span></div>
+            <div class="day-row-items">
+              <div class="day-item"><div class="day-item-time">Train</div><div class="day-item-content"><strong>Frecciarossa</strong> Bologna Centrale → Milano Centrale · ~1 hr · From €15. Book trenitalia.com</div></div>
+              <div class="day-item"><div class="day-item-time">Afternoon</div><div class="day-item-content">Milan. Hotel near Centrale — Metro M4 to Linate tomorrow.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="day-row path-a-row">
+        <div class="day-row-header">
+          <div class="day-row-date"><div class="day-row-weekday">Tue</div><div class="day-row-date-num">23</div><div class="day-row-month">Jun</div></div>
+          <div class="day-row-main">
+            <div class="day-row-location">Milan → Minneapolis</div>
+            <div class="day-row-title">Home Day — Two Routes Out of Milan</div>
+            <div class="day-row-items">
+              <div class="day-item warn"><div class="day-item-time">9:00 AM</div><div class="day-item-content">Depart hotel. Metro M4 Centrale → Linate (~30 min). <strong>LINATE (LIN) — NOT MALPENSA.</strong></div></div>
+              <div class="day-item" style="padding:6px 0 2px;"><div class="day-item-time"></div><div class="day-item-content"><span class="who-badge path-a" style="margin-bottom:4px;">Adam · Jenny · Kathryn → MSP</span></div></div>
+              <div class="day-item"><div class="day-item-time">12:20 PM</div><div class="day-item-content"><strong>DL8328</strong> (Air France) LIN → CDG · Seat 41E · Arrives 1:55 PM</div></div>
+              <div class="day-item"><div class="day-item-time">3:45 PM</div><div class="day-item-content"><strong>DL8753</strong> (Air France) CDG → MSP · Seat 41E · Arrives 5:50 PM</div></div>
+              <div class="day-item good"><div class="day-item-time">5:50 PM</div><div class="day-item-content"><strong>Home. Minneapolis.</strong></div></div>
+              <div class="day-item" style="padding:10px 0 2px;"><div class="day-item-time"></div><div class="day-item-content"><span class="who-badge path-b" style="margin-bottom:4px;">Nic · Fallon → NYC</span></div></div>
+              <div class="day-item"><div class="day-item-time">Jun 23</div><div class="day-item-content">Depart Milan → New York · Same day as MSP crew <span class="conf-badge pending">Confirm flight #</span></div></div>
+              <div class="day-item good"><div class="day-item-time"></div><div class="day-item-content"><strong>Home. New York.</strong></div></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="day-row">
-      <div class="day-row-header">
-        <div class="day-row-date"><div class="day-row-weekday">Mon</div><div class="day-row-date-num">22</div><div class="day-row-month">Jun</div></div>
-        <div class="day-row-main">
-          <div class="day-row-location">Bologna → Milan</div>
-          <div class="day-row-title">Train to Milan <span class="conf-badge pending">BOOK Train</span></div>
-          <div class="day-row-items">
-            <div class="day-item"><div class="day-item-time">Train</div><div class="day-item-content"><strong>Frecciarossa</strong> Bologna Centrale → Milano Centrale · ~1 hr · From €15. Book trenitalia.com</div></div>
-            <div class="day-item"><div class="day-item-time">Afternoon</div><div class="day-item-content">Afternoon/evening in Milan. Hotel near Centrale for Metro M4 access to Linate tomorrow.</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="day-row">
-      <div class="day-row-header">
-        <div class="day-row-date"><div class="day-row-weekday">Tue</div><div class="day-row-date-num">23</div><div class="day-row-month">Jun</div></div>
-        <div class="day-row-main">
-          <div class="day-row-location">Milan → Minneapolis</div>
-          <div class="day-row-title">Home Day <span class="conf-badge">✓ G5ME5W</span></div>
-          <div class="day-row-items">
-            <div class="day-item warn"><div class="day-item-time">9:00 AM</div><div class="day-item-content">Depart hotel. Metro M4 from Centrale → Linate (~30 min). <strong>LINATE (LIN) — NOT MALPENSA.</strong></div></div>
-            <div class="day-item"><div class="day-item-time">12:20 PM</div><div class="day-item-content"><strong>DL8328</strong> (Air France) LIN → CDG · Seat 41E · Arrives 1:55 PM</div></div>
-            <div class="day-item"><div class="day-item-time">3:45 PM</div><div class="day-item-content"><strong>DL8753</strong> (Air France) CDG → MSP · Seat 41E · Arrives 5:50 PM</div></div>
-            <div class="day-item good"><div class="day-item-time">5:50 PM</div><div class="day-item-content"><strong>Home. MSP.</strong> You did it.</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 
 </div>
