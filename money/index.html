@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="/auth.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Money · Grecian Gusts 2026</title>
+  <link rel="stylesheet" href="/shared.css" />
+  <style>
+    .kitty-hero {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+    .kitty-hero-top {
+      background: linear-gradient(135deg, #0d2a50 0%, #1b4f8a 100%);
+      padding: 36px 32px 28px;
+      text-align: center;
+      position: relative;
+    }
+    .kitty-icon { font-size: 3rem; display: block; margin-bottom: 12px; }
+    .kitty-eyebrow {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: rgba(255,255,255,0.5);
+      margin-bottom: 8px;
+    }
+    .kitty-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem; font-weight: 700; color: white;
+      margin-bottom: 6px;
+    }
+    .kitty-title em { color: var(--gold-light); font-style: italic; }
+    .kitty-subtitle { font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.5; }
+
+    .kitty-hero-body { padding: 28px 32px; text-align: center; }
+
+    .kitty-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--gold); color: white;
+      padding: 16px 36px;
+      border-radius: 12px;
+      font-size: 1rem; font-weight: 700;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(212,134,10,0.4);
+      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+      margin-bottom: 14px;
+    }
+    .kitty-btn:hover {
+      background: #b8720a;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(212,134,10,0.5);
+    }
+    .kitty-btn:active { transform: scale(0.98); }
+    .kitty-btn-icon { font-size: 1.2rem; }
+
+    .kitty-url {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; color: var(--text-muted);
+      word-break: break-all;
+    }
+
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .rule-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+    }
+    .rule-icon { font-size: 1.5rem; margin-bottom: 8px; display: block; }
+    .rule-title { font-size: 0.82rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .rule-desc { font-size: 0.77rem; color: var(--text-dim); line-height: 1.55; }
+
+    .how-list {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 28px;
+    }
+    .how-step {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .how-step:last-child { border-bottom: none; padding-bottom: 0; }
+    .how-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--navy-pale); border: 1px solid rgba(26,79,138,0.3);
+      color: var(--navy-light); font-size: 0.75rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .how-text { font-size: 0.82rem; color: var(--text-dim); line-height: 1.55; }
+    .how-text strong { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="/" class="nav-brand">⛵ Grecian <span>Gusts</span></a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/itinerary">Itinerary</a>
+    <a href="/sailing">Sailing Days</a>
+    <a href="/crew">Crew</a>
+    <a href="/training">Training</a>
+    <a href="/flights">Flights</a>
+    <a href="/packing">Packing</a>
+    <a href="/money" class="active">Money</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-eyebrow">Shared Expenses · KittySplit</div>
+  <h1>The <em>Kitty</em></h1>
+  <p>Track who paid for what, settle up at the end. One link, everyone's square.</p>
+</div>
+
+<div class="section">
+
+  <div class="kitty-hero">
+    <div class="kitty-hero-top">
+      <span class="kitty-icon">🐱</span>
+      <div class="kitty-eyebrow">Shared Trip Expenses</div>
+      <div class="kitty-title"><em>Grecian</em> Gusts Kitty</div>
+      <div class="kitty-subtitle">Log what you paid, see who owes who, settle at the end.</div>
+    </div>
+    <div class="kitty-hero-body">
+      <a href="https://www.kittysplit.com/k/lvX1q2vhOUzvB2XkXxQH2jHZGM0HEceB-2" target="_blank" rel="noopener" class="kitty-btn">
+        <span class="kitty-btn-icon">💰</span> Open KittySplit
+      </a>
+      <br />
+      <span class="kitty-url">kittysplit.com/k/lvX1q2vhOUzvB2XkXxQH2jHZGM0HEceB-2</span>
+    </div>
+  </div>
+
+  <div class="section-label">What to Track</div>
+  <h2 style="margin-bottom:20px;">Log These as You Go</h2>
+
+  <div class="rules-grid">
+    <div class="rule-card">
+      <span class="rule-icon">⛽</span>
+      <div class="rule-title">Fuel</div>
+      <div class="rule-desc">Diesel for the catamaran. Whoever pays at the marina logs it immediately.</div>
+    </div>
+    <div class="rule-card">
+      <span class="rule-icon">🛒</span>
+      <div class="rule-title">Provisioning</div>
+      <div class="rule-desc">Groceries, drinks, snacks loaded onto the boat. Split among everyone on board.</div>
+    </div>
+    <div class="rule-card">
+      <span class="rule-icon">⚓</span>
+      <div class="rule-title">Marina Fees</div>
+      <div class="rule-desc">Overnight mooring charges not covered by charter. Log per night.</div>
+    </div>
+    <div class="rule-card">
+      <span class="rule-icon">🍽️</span>
+      <div class="rule-title">Group Meals</div>
+      <div class="rule-desc">Taverna dinners, lunches, anything the whole crew eats together ashore.</div>
+    </div>
+    <div class="rule-card">
+      <span class="rule-icon">🚕</span>
+      <div class="rule-title">Shared Transport</div>
+      <div class="rule-desc">Taxis, transfers, anything shared by 2+ people getting somewhere together.</div>
+    </div>
+    <div class="rule-card">
+      <span class="rule-icon">🎟️</span>
+      <div class="rule-title">Activities</div>
+      <div class="rule-desc">Entry fees, excursions, snorkel rentals — anything the group does together.</div>
+    </div>
+  </div>
+
+  <div class="section-label">How to Use It</div>
+  <h2 style="margin-bottom:20px;">Step by Step</h2>
+
+  <div class="how-list">
+    <div class="how-step">
+      <div class="how-num">1</div>
+      <div class="how-text"><strong>Open the link above</strong> — it goes straight to the shared kitty. Bookmark it on your phone before you leave.</div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">2</div>
+      <div class="how-text"><strong>Enter your name</strong> the first time — KittySplit remembers you in the same browser after that.</div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">3</div>
+      <div class="how-text"><strong>Log expenses as they happen.</strong> Tap "Add expense," enter what you paid, who paid, and who it's split between.</div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">4</div>
+      <div class="how-text"><strong>Don't wait until the end.</strong> The longer you wait, the harder it is to remember who bought the third round of ouzo.</div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">5</div>
+      <div class="how-text"><strong>Settle up at the end of the trip.</strong> KittySplit calculates the minimum transfers — usually just 1–2 payments per person.</div>
+    </div>
+  </div>
+
+  <div class="alert info">
+    <div class="alert-icon">💡</div>
+    <div class="alert-text"><strong>Tip:</strong> Pre-trip costs (charter deposit, Airbnb, flights) are already paid and settled separately. Only log shared on-trip expenses — things bought for the group during the trip itself.</div>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <div>⛵ <strong>Grecian Gusts</strong> · June 2026</div>
+  <div style="margin-top:6px;"><a href="/">← Home</a> · <a href="/flights">Flights →</a></div>
+</footer>
+</body>
+</html>
