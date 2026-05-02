@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sailing Days · Grecian Gusts 2026</title>
   <link rel="stylesheet" href="/shared.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     .day-card {
       background: var(--card);
@@ -47,17 +48,13 @@
     }
     @media (max-width: 680px) { .day-body { grid-template-columns: 1fr; } }
 
-    .day-map-placeholder {
-      background: var(--bg2);
+    .day-map {
       border-right: 1px solid var(--border);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 32px 20px; gap: 12px; min-height: 200px;
+      min-height: 260px;
+      position: relative;
+      z-index: 0;
     }
-    @media (max-width: 680px) { .day-map-placeholder { border-right: none; border-bottom: 1px solid var(--border); } }
-    .map-pin { font-size: 2rem; }
-    .map-route { font-size: 0.78rem; color: var(--navy-light); font-weight: 600; }
-    .map-note { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--text-muted); text-align: center; line-height: 1.6; }
+    @media (max-width: 680px) { .day-map { border-right: none; border-bottom: 1px solid var(--border); min-height: 220px; } }
 
     .day-content { padding: 24px; }
     .day-content h4 {
@@ -135,11 +132,7 @@
       <div class="day-badge board">Boarding</div>
     </div>
     <div class="day-body">
-      <div class="day-map-placeholder">
-        <div class="map-pin">⚓</div>
-        <div class="map-route">Kontokali · Gouvia Marina</div>
-        <div class="map-note">Charter base<br>Corfu NE coast<br>38.658°N 20.851°E</div>
-      </div>
+      <div class="day-map" id="map1"></div>
       <div class="day-content">
         <h4>Day Highlights</h4>
         <ul class="highlight-list">
@@ -170,11 +163,7 @@
       <div class="day-badge">Sailing</div>
     </div>
     <div class="day-body">
-      <div class="day-map-placeholder">
-        <div class="map-pin">🏛</div>
-        <div class="map-route">Gouvia → Mandraki Harbor</div>
-        <div class="map-note">~1.5 hrs NE<br>Corfu Old Town<br>UNESCO World Heritage</div>
-      </div>
+      <div class="day-map" id="map2"></div>
       <div class="day-content">
         <h4>Day Highlights</h4>
         <ul class="highlight-list">
@@ -204,11 +193,7 @@
       <div class="day-badge">Sailing</div>
     </div>
     <div class="day-body">
-      <div class="day-map-placeholder">
-        <div class="map-pin">🏖</div>
-        <div class="map-route">Mandraki → Lakka, Paxos</div>
-        <div class="map-note">~2.5 hrs south<br>Optional: Antipaxos<br>Voutoumi &amp; Vriki beaches</div>
-      </div>
+      <div class="day-map" id="map3"></div>
       <div class="day-content">
         <h4>Day Highlights</h4>
         <ul class="highlight-list">
@@ -239,11 +224,7 @@
       <div class="day-badge">Sailing</div>
     </div>
     <div class="day-body">
-      <div class="day-map-placeholder">
-        <div class="map-pin">🏰</div>
-        <div class="map-route">Lakka, Paxos → Parga</div>
-        <div class="map-note">~3 hrs across<br>Mainland Greece<br>Longest passage day</div>
-      </div>
+      <div class="day-map" id="map4"></div>
       <div class="day-content">
         <h4>Day Highlights</h4>
         <ul class="highlight-list">
@@ -274,11 +255,7 @@
       <div class="day-badge">Sailing</div>
     </div>
     <div class="day-body">
-      <div class="day-map-placeholder">
-        <div class="map-pin">🌊</div>
-        <div class="map-route">Parga → Sivota Mourtos</div>
-        <div class="map-note">~2 hrs north<br>Blue Lagoon anchorage<br>Bella Vraka Beach</div>
-      </div>
+      <div class="day-map" id="map5"></div>
       <div class="day-content">
         <h4>Day Highlights</h4>
         <ul class="highlight-list">
@@ -309,11 +286,7 @@
       <div class="day-badge">Sailing</div>
     </div>
     <div class="day-body">
-      <div class="day-map-placeholder">
-        <div class="map-pin">🎣</div>
-        <div class="map-route">Sivota → Plataria</div>
-        <div class="map-note">~1.5 hrs north<br>Mainland Greece<br>Quiet fishing village</div>
-      </div>
+      <div class="day-map" id="map6"></div>
       <div class="day-content">
         <h4>Day Highlights</h4>
         <ul class="highlight-list">
@@ -344,11 +317,7 @@
       <div class="day-badge return">Final Day</div>
     </div>
     <div class="day-body">
-      <div class="day-map-placeholder">
-        <div class="map-pin">🔄</div>
-        <div class="map-route">Plataria → Gouvia Marina, Corfu</div>
-        <div class="map-note">~2.5 hrs back to Corfu<br>Final night aboard<br>Ryanair departs 12:15 AM</div>
-      </div>
+      <div class="day-map" id="map7"></div>
       <div class="day-content">
         <h4>Critical Timeline</h4>
         <ul class="highlight-list">
@@ -368,6 +337,119 @@
   </div>
 
 </div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // Port coordinates
+  var PORTS = {
+    gouvia:   [39.6577, 19.8456],
+    mandraki: [39.6240, 19.9207],
+    lakka:    [39.2243, 20.1319],
+    antipaxos:[39.1510, 20.1640],
+    parga:    [39.2837, 20.4012],
+    sivota:   [39.3937, 20.2337],
+    plataria: [39.4344, 20.2481]
+  };
+
+  var TILES = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+  var ATTR  = '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>';
+
+  function portIcon(color) {
+    return L.divIcon({
+      className: '',
+      html: '<div style="width:12px;height:12px;border-radius:50%;background:' + color + ';border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4);"></div>',
+      iconSize: [12, 12],
+      iconAnchor: [6, 6]
+    });
+  }
+
+  function makeMap(id, opts) {
+    var map = L.map(id, { zoomControl: false, attributionControl: false, scrollWheelZoom: false, dragging: false });
+    L.tileLayer(TILES, { attribution: ATTR, maxZoom: 15 }).addTo(map);
+
+    if (opts.route && opts.route.length > 1) {
+      // Dashed route line
+      L.polyline(opts.route, { color: '#1b4f8a', weight: 2.5, opacity: 0.85, dashArray: '6 5' }).addTo(map);
+      // Start marker (gold)
+      L.marker(opts.route[0], { icon: portIcon('#d4860a') })
+        .bindTooltip(opts.labels[0], { permanent: true, direction: 'top', offset: [0, -8], className: 'map-tt' })
+        .addTo(map);
+      // End marker (navy)
+      L.marker(opts.route[opts.route.length - 1], { icon: portIcon('#1b4f8a') })
+        .bindTooltip(opts.labels[opts.labels.length - 1], { permanent: true, direction: 'top', offset: [0, -8], className: 'map-tt' })
+        .addTo(map);
+      // Fit bounds with padding
+      map.fitBounds(L.polyline(opts.route).getBounds(), { padding: [32, 32] });
+    } else {
+      // Single point
+      var pt = opts.route[0];
+      map.setView(pt, opts.zoom || 13);
+      L.marker(pt, { icon: portIcon('#d4860a') })
+        .bindTooltip(opts.labels[0], { permanent: true, direction: 'top', offset: [0, -8], className: 'map-tt' })
+        .addTo(map);
+    }
+    return map;
+  }
+
+  // Day 1 — Gouvia Marina (boarding, single point)
+  makeMap('map1', {
+    route: [PORTS.gouvia],
+    labels: ['Gouvia Marina'],
+    zoom: 13
+  });
+
+  // Day 2 — Gouvia → Mandraki
+  makeMap('map2', {
+    route: [PORTS.gouvia, PORTS.mandraki],
+    labels: ['Gouvia Marina', 'Mandraki Harbor']
+  });
+
+  // Day 3 — Mandraki → Lakka (via Antipaxos optional)
+  makeMap('map3', {
+    route: [PORTS.mandraki, PORTS.lakka],
+    labels: ['Mandraki', 'Lakka, Paxos']
+  });
+
+  // Day 4 — Lakka → Parga
+  makeMap('map4', {
+    route: [PORTS.lakka, PORTS.parga],
+    labels: ['Lakka, Paxos', 'Parga']
+  });
+
+  // Day 5 — Parga → Sivota
+  makeMap('map5', {
+    route: [PORTS.parga, PORTS.sivota],
+    labels: ['Parga', 'Sivota Mourtos']
+  });
+
+  // Day 6 — Sivota → Plataria
+  makeMap('map6', {
+    route: [PORTS.sivota, PORTS.plataria],
+    labels: ['Sivota', 'Plataria']
+  });
+
+  // Day 7 — Plataria → Gouvia (return)
+  makeMap('map7', {
+    route: [PORTS.plataria, PORTS.sivota, PORTS.parga, PORTS.lakka, PORTS.mandraki, PORTS.gouvia],
+    labels: ['Plataria', 'Gouvia Marina']
+  });
+</script>
+<style>
+  .map-tt {
+    background: white !important;
+    border: 1px solid rgba(26,79,138,0.2) !important;
+    border-radius: 4px !important;
+    color: #1b4f8a !important;
+    font-family: 'Karla', sans-serif !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    padding: 2px 7px !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12) !important;
+    white-space: nowrap !important;
+  }
+  .map-tt::before { display: none !important; }
+  .leaflet-attribution-flag { display: none !important; }
+</style>
 
 <footer class="site-footer">
   <div>⛵ <strong>Grecian Gusts</strong> · Sunsail 454L · Ionian Sea · June 2026</div>
