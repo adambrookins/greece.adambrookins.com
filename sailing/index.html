@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="/auth.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sailing Days · Grecian Gusts 2026</title>
+  <link rel="stylesheet" href="/shared.css" />
+  <style>
+    .day-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+      margin-bottom: 24px;
+      scroll-margin-top: 70px;
+    }
+    .day-header {
+      display: flex; align-items: center; gap: 16px;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(26,79,138,0.04);
+    }
+    .day-num {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--navy-light); border: 2px solid var(--blue);
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; flex-shrink: 0;
+    }
+    .day-num-label { font-size: 0.5rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .day-num-n { font-size: 1.2rem; font-weight: 800; color: var(--navy-light); line-height: 1; }
+    .day-header-text { flex: 1; }
+    .day-date { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 3px; }
+    .day-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--text); }
+    .day-subtitle { font-size: 0.8rem; color: var(--text-dim); margin-top: 2px; }
+    .day-badge {
+      font-size: 0.68rem; font-weight: 700; padding: 5px 12px;
+      border-radius: 12px; white-space: nowrap; flex-shrink: 0;
+      background: #001525; border: 1px solid #0c4a6e; color: var(--navy-light);
+    }
+    .day-badge.board { background: #2a1a00; border-color: #78350f; color: var(--gold-light); }
+    .day-badge.return { background: #1a0800; border-color: #7c2d12; color: #fca5a5; }
+
+    .day-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    @media (max-width: 680px) { .day-body { grid-template-columns: 1fr; } }
+
+    .day-map-placeholder {
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px 20px; gap: 12px; min-height: 200px;
+    }
+    @media (max-width: 680px) { .day-map-placeholder { border-right: none; border-bottom: 1px solid var(--border); } }
+    .map-pin { font-size: 2rem; }
+    .map-route { font-size: 0.78rem; color: var(--navy-light); font-weight: 600; }
+    .map-note { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--text-muted); text-align: center; line-height: 1.6; }
+
+    .day-content { padding: 24px; }
+    .day-content h4 {
+      font-size: 0.64rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;
+    }
+    .highlight-list { list-style: none; margin-bottom: 16px; }
+    .highlight-list li {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: 0.82rem; color: var(--text-dim); padding: 5px 0;
+      border-bottom: 1px solid rgba(30,58,95,0.3);
+      line-height: 1.45;
+    }
+    .highlight-list li:last-child { border-bottom: none; }
+    .highlight-list li strong { color: var(--text); }
+    .hl-icon { flex-shrink: 0; margin-top: 1px; }
+
+    .detail-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 5px 0; border-bottom: 1px solid rgba(30,58,95,0.3);
+      font-size: 0.78rem;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-key { color: var(--text-muted); }
+    .detail-val { color: var(--text); font-weight: 600; text-align: right; max-width: 60%; }
+    .detail-val.warn { color: #fb923c; }
+    .detail-val.good { color: var(--green); }
+
+    .pirate-note {
+      background: rgba(26,79,138,0.06);
+      border: 1px solid rgba(26,79,138,0.2);
+      border-radius: 8px; padding: 10px 14px;
+      font-size: 0.78rem; color: var(--navy);
+      font-style: italic; margin-top: 14px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="/" class="nav-brand">⛵ Grecian <span>Gusts</span></a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/itinerary">Itinerary</a>
+    <a href="/sailing" class="active">Sailing Days</a>
+    <a href="/crew">Crew</a>
+    <a href="/training">Training</a>
+    <a href="/flights">Flights</a>
+    <a href="/packing">Packing</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-eyebrow">Jun 13–19, 2026 · Sunsail 454L</div>
+  <h1>The <em>Sailing</em> Days</h1>
+  <p>7 days, 6 stops, 1 catamaran, and approximately zero times anyone will correctly coil a line on their first attempt.</p>
+</div>
+
+<div class="section">
+  <div class="alert info">
+    <div class="alert-icon">⚓</div>
+    <div class="alert-text"><strong>Captain Dustin has final say on all routing.</strong> The itinerary below is the planned baseline from Sunsail. Wind, weather, and vibes may alter the plan. Mornings are calmer — expect early departures. Med mooring is used at every marina. Watch Module 4.</div>
+  </div>
+
+  <!-- DAY 1 -->
+  <div class="day-card" id="day1">
+    <div class="day-header">
+      <div class="day-num"><div class="day-num-label">Day</div><div class="day-num-n">1</div></div>
+      <div class="day-header-text">
+        <div class="day-date">Saturday, June 13, 2026</div>
+        <div class="day-title">Gouvia Marina, Corfu</div>
+        <div class="day-subtitle">Boarding day — settle in, provision, explore</div>
+      </div>
+      <div class="day-badge board">Boarding</div>
+    </div>
+    <div class="day-body">
+      <div class="day-map-placeholder">
+        <div class="map-pin">⚓</div>
+        <div class="map-route">Kontokali · Gouvia Marina</div>
+        <div class="map-note">Charter base<br>Corfu NE coast<br>38.658°N 20.851°E</div>
+      </div>
+      <div class="day-content">
+        <h4>Day Highlights</h4>
+        <ul class="highlight-list">
+          <li><span class="hl-icon">🕕</span> <span><strong>Boarding 6:00 PM.</strong> Check in at Kontokali base. Sign T&amp;C if not already done.</span></li>
+          <li><span class="hl-icon">🛒</span> <span><strong>Provision the boat.</strong> Provisioning stores at marina. Split cost on boarding day.</span></li>
+          <li><span class="hl-icon">🏰</span> <span>Achilleion Palace nearby if anyone has energy after the early ATH flight.</span></li>
+          <li><span class="hl-icon">🍻</span> <span>Waterfront tavernas at Gouvia for dinner. First Greek meal. Order everything.</span></li>
+        </ul>
+        <h4>Marina Details</h4>
+        <div class="detail-row"><span class="detail-key">Mooring</span><span class="detail-val">Gouvia Marina, Kontokali</span></div>
+        <div class="detail-row"><span class="detail-key">Facilities</span><span class="detail-val good">Water, power, WiFi, fuel, showers</span></div>
+        <div class="detail-row"><span class="detail-key">ATMs</span><span class="detail-val good">Yes — stock up on euros</span></div>
+        <div class="detail-row"><span class="detail-key">Provisioning</span><span class="detail-val">Stores on marina, split cost today</span></div>
+        <div class="pirate-note">⚓ "Welcome aboard, ye landlubbers. This is the moment when a normal person becomes a sailor. Or at least someone who knows where the fenders are stored."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 2 -->
+  <div class="day-card" id="day2">
+    <div class="day-header">
+      <div class="day-num"><div class="day-num-label">Day</div><div class="day-num-n">2</div></div>
+      <div class="day-header-text">
+        <div class="day-date">Sunday, June 14, 2026</div>
+        <div class="day-title">Mandraki Harbor, Corfu Old Town</div>
+        <div class="day-subtitle">~1.5 hrs · UNESCO heritage · first Med moor</div>
+      </div>
+      <div class="day-badge">Sailing</div>
+    </div>
+    <div class="day-body">
+      <div class="day-map-placeholder">
+        <div class="map-pin">🏛</div>
+        <div class="map-route">Gouvia → Mandraki Harbor</div>
+        <div class="map-note">~1.5 hrs NE<br>Corfu Old Town<br>UNESCO World Heritage</div>
+      </div>
+      <div class="day-content">
+        <h4>Day Highlights</h4>
+        <ul class="highlight-list">
+          <li><span class="hl-icon">🏛</span> <span><strong>Corfu Old Town</strong> — UNESCO site. Venetian architecture, narrow lanes, incredible food.</span></li>
+          <li><span class="hl-icon">🏰</span> <span><strong>Palaio Frourio</strong> — Old Fortress with sweeping views of the Ionian.</span></li>
+          <li><span class="hl-icon">☕</span> <span><strong>Liston Promenade</strong> — tree-lined arcade for coffee, people-watching, and pretending you live here.</span></li>
+          <li><span class="hl-icon">🎭</span> <span>Byzantine Museum, Venetian architecture throughout Old Town.</span></li>
+        </ul>
+        <h4>Marina Details</h4>
+        <div class="detail-row"><span class="detail-key">Mooring</span><span class="detail-val warn">Mandraki — small, high demand, arrive early</span></div>
+        <div class="detail-row"><span class="detail-key">Moor type</span><span class="detail-val warn">Med mooring — Module 4</span></div>
+        <div class="detail-row"><span class="detail-key">Facilities</span><span class="detail-val good">Water, power, showers, restaurants</span></div>
+        <div class="pirate-note">🗺 "Mandraki fills up fast. The captain may call ahead. Crew should be on deck, fenders ready, before arrival. This is your first live Med moor. Breathe."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 3 -->
+  <div class="day-card" id="day3">
+    <div class="day-header">
+      <div class="day-num"><div class="day-num-label">Day</div><div class="day-num-n">3</div></div>
+      <div class="day-header-text">
+        <div class="day-date">Monday, June 15, 2026</div>
+        <div class="day-title">Lakka, Paxos</div>
+        <div class="day-subtitle">~2.5 hrs south · crystal-clear anchorage · sea caves</div>
+      </div>
+      <div class="day-badge">Sailing</div>
+    </div>
+    <div class="day-body">
+      <div class="day-map-placeholder">
+        <div class="map-pin">🏖</div>
+        <div class="map-route">Mandraki → Lakka, Paxos</div>
+        <div class="map-note">~2.5 hrs south<br>Optional: Antipaxos<br>Voutoumi &amp; Vriki beaches</div>
+      </div>
+      <div class="day-content">
+        <h4>Day Highlights</h4>
+        <ul class="highlight-list">
+          <li><span class="hl-icon">💎</span> <span><strong>Crystal-clear water.</strong> Paxos is famous for it. Actual swimming, not "we'll see it from the boat" swimming.</span></li>
+          <li><span class="hl-icon">🚣</span> <span><strong>Sea caves by kayak</strong> — rent in Lakka or use the boat's dinghy to explore the coastline.</span></li>
+          <li><span class="hl-icon">🏝</span> <span><strong>Optional: Antipaxos</strong> — anchor at Voutoumi or Vriki for snorkeling. The water is absurdly blue.</span></li>
+          <li><span class="hl-icon">🐙</span> <span>Lakka tavernas for lunch and dinner. Fresh seafood. Grilled octopus mandatory.</span></li>
+        </ul>
+        <h4>Anchorage Details</h4>
+        <div class="detail-row"><span class="detail-key">Mooring</span><span class="detail-val">Lakka Bay anchorage or town quay</span></div>
+        <div class="detail-row"><span class="detail-key">Depth</span><span class="detail-val">5–10m, sand &amp; weed</span></div>
+        <div class="detail-row"><span class="detail-key">Arrival</span><span class="detail-val warn">Early — popular spot</span></div>
+        <div class="detail-row"><span class="detail-key">Antipaxos alt</span><span class="detail-val">Vriki / Voutoumi, 5–12m sand</span></div>
+        <div class="pirate-note">🏴‍☠️ "Paxos has the clearest water in the Ionian. If you don't get in the water here, you have made a navigational error of life."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 4 -->
+  <div class="day-card" id="day4">
+    <div class="day-header">
+      <div class="day-num"><div class="day-num-label">Day</div><div class="day-num-n">4</div></div>
+      <div class="day-header-text">
+        <div class="day-date">Tuesday, June 16, 2026</div>
+        <div class="day-title">Parga, Mainland Greece</div>
+        <div class="day-subtitle">~3 hrs across the Ionian · Venetian castle · colorful hillside</div>
+      </div>
+      <div class="day-badge">Sailing</div>
+    </div>
+    <div class="day-body">
+      <div class="day-map-placeholder">
+        <div class="map-pin">🏰</div>
+        <div class="map-route">Lakka, Paxos → Parga</div>
+        <div class="map-note">~3 hrs across<br>Mainland Greece<br>Longest passage day</div>
+      </div>
+      <div class="day-content">
+        <h4>Day Highlights</h4>
+        <ul class="highlight-list">
+          <li><span class="hl-icon">🏰</span> <span><strong>Venetian Castle</strong> — panoramic views over Parga bay and the Ionian coast. Worth the climb.</span></li>
+          <li><span class="hl-icon">🏘</span> <span><strong>Colorful hillside town</strong> — orange and terracotta houses cascading to the water.</span></li>
+          <li><span class="hl-icon">🏊</span> <span><strong>Swim to Panagia Island chapel</strong> — tiny chapel on a tiny island right in the bay. Very "Greece postcard."</span></li>
+          <li><span class="hl-icon">🍷</span> <span>Vibrant nightlife — Parga has good bars and restaurants right on the waterfront.</span></li>
+        </ul>
+        <h4>Mooring Details</h4>
+        <div class="detail-row"><span class="detail-key">Mooring</span><span class="detail-val">Town quay or bay anchorage</span></div>
+        <div class="detail-row"><span class="detail-key">Moor type</span><span class="detail-val warn">Med mooring or anchor</span></div>
+        <div class="detail-row"><span class="detail-key">Peak season</span><span class="detail-val warn">Arrive early in June</span></div>
+        <div class="detail-row"><span class="detail-key">Facilities</span><span class="detail-val good">Water, power, restaurants, ATMs</span></div>
+        <div class="pirate-note">⚓ "3 hours of open water sailing. If the Maestral is blowing, it could be lively. This is the passage where someone will discover they are, in fact, mildly seasick."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 5 -->
+  <div class="day-card" id="day5">
+    <div class="day-header">
+      <div class="day-num"><div class="day-num-label">Day</div><div class="day-num-n">5</div></div>
+      <div class="day-header-text">
+        <div class="day-date">Wednesday, June 17, 2026</div>
+        <div class="day-title">Sivota Mourtos</div>
+        <div class="day-subtitle">~2 hrs north · Blue Lagoon · Bella Vraka Beach</div>
+      </div>
+      <div class="day-badge">Sailing</div>
+    </div>
+    <div class="day-body">
+      <div class="day-map-placeholder">
+        <div class="map-pin">🌊</div>
+        <div class="map-route">Parga → Sivota Mourtos</div>
+        <div class="map-note">~2 hrs north<br>Blue Lagoon anchorage<br>Bella Vraka Beach</div>
+      </div>
+      <div class="day-content">
+        <h4>Day Highlights</h4>
+        <ul class="highlight-list">
+          <li><span class="hl-icon">🏊</span> <span><strong>Blue Lagoon snorkeling</strong> — sheltered, turquoise water. Snorkel gear will get actual use here.</span></li>
+          <li><span class="hl-icon">🏖</span> <span><strong>Bella Vraka Beach</strong> — connected to the mainland by a sand bar. Water sports available.</span></li>
+          <li><span class="hl-icon">🚤</span> <span><strong>Sea caves by dinghy</strong> — use the tender to explore the cave-riddled coastline behind the islands.</span></li>
+          <li><span class="hl-icon">🍺</span> <span>Sand Bar Bay water sports bar — one of those places that shouldn't exist but absolutely does.</span></li>
+        </ul>
+        <h4>Mooring Details</h4>
+        <div class="detail-row"><span class="detail-key">Mooring</span><span class="detail-val">Town quay or sheltered anchorage</span></div>
+        <div class="detail-row"><span class="detail-key">Depth</span><span class="detail-val">3–6m, sandy bottom</span></div>
+        <div class="detail-row"><span class="detail-key">Crowds</span><span class="detail-val warn">Busy in June</span></div>
+        <div class="detail-row"><span class="detail-key">Facilities</span><span class="detail-val good">Water, power, tavernas, laundry</span></div>
+        <div class="pirate-note">🌊 "The Blue Lagoon looks fake. It doesn't look real. Someone will take 200 photos and post none of them because no filter makes it look more real than it already is."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 6 -->
+  <div class="day-card" id="day6">
+    <div class="day-header">
+      <div class="day-num"><div class="day-num-label">Day</div><div class="day-num-n">6</div></div>
+      <div class="day-header-text">
+        <div class="day-date">Thursday, June 18, 2026</div>
+        <div class="day-title">Plataria, Mainland Greece</div>
+        <div class="day-subtitle">~1.5 hrs north · quiet fishing village · authentic</div>
+      </div>
+      <div class="day-badge">Sailing</div>
+    </div>
+    <div class="day-body">
+      <div class="day-map-placeholder">
+        <div class="map-pin">🎣</div>
+        <div class="map-route">Sivota → Plataria</div>
+        <div class="map-note">~1.5 hrs north<br>Mainland Greece<br>Quiet fishing village</div>
+      </div>
+      <div class="day-content">
+        <h4>Day Highlights</h4>
+        <ul class="highlight-list">
+          <li><span class="hl-icon">🎣</span> <span><strong>Authentic Greek waterfront.</strong> No tourists, just locals and tavernas that have been there forever.</span></li>
+          <li><span class="hl-icon">🐟</span> <span><strong>Local seafood.</strong> Catch-of-the-day straight from the boats that were out that morning.</span></li>
+          <li><span class="hl-icon">😌</span> <span><strong>Relaxed pace.</strong> The anti-Mykonos. Sit, eat, watch the sun go down. Nothing scheduled.</span></li>
+          <li><span class="hl-icon">🌅</span> <span>Last full evening in mainland Greece. Good night to sit in the cockpit with wine.</span></li>
+        </ul>
+        <h4>Mooring Details</h4>
+        <div class="detail-row"><span class="detail-key">Mooring</span><span class="detail-val good">Well-protected quay, lazy lines</span></div>
+        <div class="detail-row"><span class="detail-key">Shelter</span><span class="detail-val good">Breakwater — very protected</span></div>
+        <div class="detail-row"><span class="detail-key">Vibe</span><span class="detail-val">Very local, very quiet</span></div>
+        <div class="detail-row"><span class="detail-key">Facilities</span><span class="detail-val">Water, tavernas, local shops</span></div>
+        <div class="pirate-note">🏴‍☠️ "Plataria is the kind of place pirates would retire to. Which is fitting, because at this point you're all basically pirates."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 7 -->
+  <div class="day-card" id="day7">
+    <div class="day-header">
+      <div class="day-num"><div class="day-num-label">Day</div><div class="day-num-n">7</div></div>
+      <div class="day-header-text">
+        <div class="day-date">Friday, June 19, 2026</div>
+        <div class="day-title">Return to Corfu</div>
+        <div class="day-subtitle">~2.5 hrs · final night aboard · 10:30 PM marina departure</div>
+      </div>
+      <div class="day-badge return">Final Day</div>
+    </div>
+    <div class="day-body">
+      <div class="day-map-placeholder">
+        <div class="map-pin">🔄</div>
+        <div class="map-route">Plataria → Gouvia Marina, Corfu</div>
+        <div class="map-note">~2.5 hrs back to Corfu<br>Final night aboard<br>Ryanair departs 12:15 AM</div>
+      </div>
+      <div class="day-content">
+        <h4>Critical Timeline</h4>
+        <ul class="highlight-list">
+          <li><span class="hl-icon">⛵</span> <span><strong>Sail back to Gouvia Marina.</strong> Return sail ~2.5 hours. Last look at the Ionian.</span></li>
+          <li><span class="hl-icon">🧹</span> <span><strong>Off boat by 10:00 AM Saturday.</strong> Final pack-up, clean boat per charter rules.</span></li>
+          <li><span class="hl-icon">🍽</span> <span>Final evening in Corfu — dinner ashore. Good night for a proper send-off meal.</span></li>
+          <li><span class="hl-icon">✈️</span> <span><strong>Depart marina by 10:30 PM</strong> for CFU airport. Ryanair FR5155 departs 12:15 AM (Jun 20).</span></li>
+        </ul>
+        <h4>Important Times</h4>
+        <div class="detail-row"><span class="detail-key">Off boat by</span><span class="detail-val warn">10:00 AM Saturday Jun 20</span></div>
+        <div class="detail-row"><span class="detail-key">Depart marina</span><span class="detail-val warn">10:30 PM Friday Jun 19</span></div>
+        <div class="detail-row"><span class="detail-key">Flight departs</span><span class="detail-val warn">12:15 AM Sat Jun 20 (CFU)</span></div>
+        <div class="detail-row"><span class="detail-key">Arrives Bologna</span><span class="detail-val">1:00 AM BLQ</span></div>
+        <div class="pirate-note">⚠️ "Don't miss the boat. Then don't miss the plane. Both sentences apply here, just in different order. The Ryanair gate closes 40 minutes before departure."</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <div>⛵ <strong>Grecian Gusts</strong> · Sunsail 454L · Ionian Sea · June 2026</div>
+  <div style="margin-top:6px;"><a href="/">← Back to Home</a> · <a href="/itinerary">Full Itinerary →</a></div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="/auth.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grecian Gusts · Greece 2026</title>
+  <link rel="stylesheet" href="/shared.css" />
+  <style>
+    /* ── HOMEPAGE HERO ── */
+    .hero {
+      min-height: 90vh;
+      background: linear-gradient(180deg, var(--navy) 0%, var(--navy-light) 55%, var(--sky) 100%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 60px 24px 100px;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 50% 100%, rgba(74,144,217,0.3) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 30% 20%, rgba(255,255,255,0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-wave {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      line-height: 0;
+    }
+
+    .hero-flag {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.2em;
+      text-transform: uppercase; color: rgba(255,255,255,0.65);
+      margin-bottom: 20px; position: relative;
+    }
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.5rem, 10vw, 7rem);
+      font-weight: 700; font-style: italic; line-height: 1.0;
+      color: white; position: relative;
+      margin-bottom: 6px;
+    }
+    .hero h1 em { font-style: normal; color: var(--gold-light); }
+    .hero-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      font-style: italic; color: rgba(255,255,255,0.75);
+      margin-bottom: 12px; position: relative;
+    }
+    .hero-tagline {
+      font-size: 0.9rem; color: rgba(255,255,255,0.65);
+      max-width: 480px; margin: 0 auto 32px;
+      position: relative; line-height: 1.6;
+    }
+    .hero-pills {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      justify-content: center; position: relative;
+      margin-bottom: 48px;
+    }
+    .hero-pill {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.22);
+      color: rgba(255,255,255,0.85); font-size: 0.73rem; font-weight: 600;
+      padding: 5px 14px; border-radius: 20px;
+    }
+    .hero-scroll {
+      position: absolute; bottom: 68px; left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.45); font-size: 0.68rem;
+      font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; display: flex;
+      flex-direction: column; align-items: center; gap: 6px;
+    }
+    .scroll-arrow {
+      width: 1px; height: 30px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.4; transform: scaleY(1); }
+      50% { opacity: 0.9; transform: scaleY(1.1); }
+    }
+
+    /* ── NAV CARDS ── */
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .nav-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+      text-decoration: none; color: inherit;
+      display: flex; flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: var(--shadow);
+    }
+    .nav-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+    .nav-card-accent { height: 3px; }
+    .accent-gold   { background: var(--gold); }
+    .accent-navy   { background: var(--navy); }
+    .accent-sky    { background: var(--sky); }
+    .accent-green  { background: var(--green); }
+    .accent-purple { background: #6b4fa0; }
+    .accent-teal   { background: #2a9d8f; }
+    .accent-rose   { background: #c04060; }
+
+    .nav-card-body { padding: 22px 22px 18px; flex: 1; }
+    .nav-card-icon { font-size: 1.6rem; margin-bottom: 10px; }
+    .nav-card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem; font-weight: 700; font-style: italic;
+      color: var(--text); margin-bottom: 5px;
+    }
+    .nav-card-desc { font-size: 0.81rem; color: var(--text-dim); line-height: 1.5; }
+    .nav-card-footer {
+      padding: 11px 22px;
+      border-top: 1px solid var(--border);
+      background: var(--bg2);
+      font-size: 0.7rem; font-weight: 700; color: var(--text-muted);
+      display: flex; align-items: center; justify-content: space-between;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .nav-card-arrow { font-size: 1rem; transition: transform 0.2s; color: var(--text-muted); }
+    .nav-card:hover .nav-card-arrow { transform: translateX(4px); color: var(--navy); }
+
+    /* ── TIMELINE STRIP ── */
+    .timeline-strip {
+      background: var(--navy);
+      border-radius: 12px; padding: 24px;
+      overflow-x: auto;
+      box-shadow: var(--shadow-md);
+    }
+    .timeline-row { display: flex; gap: 0; min-width: 700px; }
+    .tl-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+      position: relative; padding: 0 4px;
+    }
+    .tl-item:not(:last-child)::after {
+      content: '';
+      position: absolute; top: 13px; right: -50%;
+      width: 100%; height: 2px;
+      background: rgba(255,255,255,0.15);
+      z-index: 0;
+    }
+    .tl-dot {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; z-index: 1; margin-bottom: 8px; flex-shrink: 0;
+    }
+    .tl-dot.active  { border-color: var(--gold-light); background: rgba(212,134,10,0.25); }
+    .tl-dot.sailing { border-color: var(--sky-light);  background: rgba(74,144,217,0.2); }
+    .tl-dot.land    { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.1); }
+    .tl-date  { font-size: 0.62rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.04em; }
+    .tl-place { font-size: 0.7rem; font-weight: 600; color: rgba(255,255,255,0.75); margin-top: 2px; }
+
+    /* ── CREW STRIP ── */
+    .crew-strip {
+      display: flex; gap: 12px; overflow-x: auto;
+      padding-bottom: 8px; scrollbar-width: none;
+    }
+    .crew-strip::-webkit-scrollbar { display: none; }
+    .crew-chip {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 16px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 4px;
+      flex-shrink: 0; width: 110px;
+      text-decoration: none; color: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      box-shadow: var(--shadow);
+    }
+    .crew-chip:hover { border-color: var(--navy); box-shadow: var(--shadow-md); }
+    .crew-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--navy-pale); border: 2px solid var(--navy);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 700; color: var(--navy);
+      font-family: 'Cormorant Garamond', serif;
+    }
+    .crew-chip-name { font-size: 0.72rem; font-weight: 700; color: var(--text); text-align: center; }
+    .crew-chip-role { font-size: 0.62rem; color: var(--text-muted); text-align: center; }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="/" class="nav-brand">⛵ Grecian <span>Gusts</span></a>
+  <div class="nav-links">
+    <a href="/" class="active">Home</a>
+    <a href="/itinerary">Itinerary</a>
+    <a href="/sailing">Sailing Days</a>
+    <a href="/crew">Crew</a>
+    <a href="/training">Training</a>
+    <a href="/flights">Flights</a>
+    <a href="/packing">Packing</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-flag">June 10 – 23, 2026 · Minneapolis → Athens → Ionian Sea → Bologna → Milan</div>
+  <h1><em>Grecian</em><br>Gusts</h1>
+  <div class="hero-sub">A catamaran adventure in the Ionian Islands</div>
+  <p class="hero-tagline">7 friends, 1 captain, 1 catamaran, 7 sailing days, too much feta, and absolutely zero idea what a lazy line is.</p>
+  <div class="hero-pills">
+    <div class="hero-pill">⛵ Sunsail 454L · 45ft Cat</div>
+    <div class="hero-pill">⚓ Captain Dustin</div>
+    <div class="hero-pill">🇬🇷 Corfu · Paxos · Ionian</div>
+    <div class="hero-pill">👥 7 Crew</div>
+    <div class="hero-pill">🇮🇹 Bologna bonus round</div>
+  </div>
+  <div class="hero-scroll">
+    <span>Explore</span>
+    <div class="scroll-arrow"></div>
+  </div>
+  <div class="hero-wave">
+    <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="width:100%;height:60px;">
+      <path d="M0,30 C240,60 480,0 720,30 C960,60 1200,0 1440,30 L1440,60 L0,60 Z" fill="#f7f3ec"/>
+    </svg>
+  </div>
+</div>
+
+<!-- TIMELINE SECTION -->
+<div class="section">
+  <div class="section-label">Full Trip · Jun 10–23</div>
+  <h2>The Grand Voyage</h2>
+  <p class="section-desc">Minneapolis → Athens → Corfu → Ionian Islands → Bologna → Milan → Home. 13 days, no regrets.</p>
+
+  <div class="timeline-strip">
+    <div class="timeline-row">
+      <div class="tl-item">
+        <div class="tl-dot land">✈</div>
+        <div class="tl-date">Jun 10</div>
+        <div class="tl-place">Depart MSP</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot land">🏛</div>
+        <div class="tl-date">Jun 11–12</div>
+        <div class="tl-place">Athens</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot active">⛵</div>
+        <div class="tl-date">Jun 13</div>
+        <div class="tl-place">Board Corfu</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot sailing">⚓</div>
+        <div class="tl-date">Jun 14</div>
+        <div class="tl-place">Corfu Town</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot sailing">🏖</div>
+        <div class="tl-date">Jun 15</div>
+        <div class="tl-place">Paxos</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot sailing">🏰</div>
+        <div class="tl-date">Jun 16</div>
+        <div class="tl-place">Parga</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot sailing">🌊</div>
+        <div class="tl-date">Jun 17</div>
+        <div class="tl-place">Sivota</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot sailing">🎣</div>
+        <div class="tl-date">Jun 18</div>
+        <div class="tl-place">Plataria</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot active">🔄</div>
+        <div class="tl-date">Jun 19</div>
+        <div class="tl-place">Back to Corfu</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot land">🍝</div>
+        <div class="tl-date">Jun 20–21</div>
+        <div class="tl-place">Bologna</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot land">🏙</div>
+        <div class="tl-date">Jun 22</div>
+        <div class="tl-place">Milan</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot land">🏠</div>
+        <div class="tl-date">Jun 23</div>
+        <div class="tl-place">Home MSP</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="section-sep" />
+
+<!-- NAVIGATION CARDS -->
+<div class="section">
+  <div class="section-label">Explore the Site</div>
+  <h2>Everything You Need</h2>
+  <p class="section-desc">All the plans, prep, and pirate knowledge in one place. No excuses for showing up unprepared.</p>
+
+  <div class="nav-grid">
+
+    <a href="/itinerary" class="nav-card">
+      <div class="nav-card-accent accent-gold"></div>
+      <div class="nav-card-body">
+        <div class="nav-card-icon">🗓</div>
+        <div class="nav-card-title">Full Itinerary</div>
+        <div class="nav-card-desc">Day-by-day plan from MSP departure to Milan return. Flights, hotels, times, and "please don't miss this" notes.</div>
+      </div>
+      <div class="nav-card-footer">
+        <span>Jun 10 – 23, 2026</span>
+        <span class="nav-card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="/sailing" class="nav-card">
+      <div class="nav-card-accent accent-sky"></div>
+      <div class="nav-card-body">
+        <div class="nav-card-icon">⛵</div>
+        <div class="nav-card-title">Sailing Days</div>
+        <div class="nav-card-desc">The 7 sailing days aboard Sunsail 454L. Daily routes, anchorages, highlights, and what to expect at each stop.</div>
+      </div>
+      <div class="nav-card-footer">
+        <span>Days 1–7 · Jun 13–19</span>
+        <span class="nav-card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="/crew" class="nav-card">
+      <div class="nav-card-accent accent-terra"></div>
+      <div class="nav-card-body">
+        <div class="nav-card-icon">🏴‍☠️</div>
+        <div class="nav-card-title">The Crew</div>
+        <div class="nav-card-desc">Meet your shipmates. 7 very capable adults who have definitely all sailed before and know exactly what a cleat is.</div>
+      </div>
+      <div class="nav-card-footer">
+        <span>7 crew · 1 captain</span>
+        <span class="nav-card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="/training" class="nav-card">
+      <div class="nav-card-accent accent-green"></div>
+      <div class="nav-card-body">
+        <div class="nav-card-icon">🎓</div>
+        <div class="nav-card-title">Crew Training</div>
+        <div class="nav-card-desc">Four video modules covering catamaran maneuvering, docking, anchoring, and Med mooring. Watch before boarding. Captain's orders.</div>
+      </div>
+      <div class="nav-card-footer">
+        <span>4 modules · Required viewing</span>
+        <span class="nav-card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="/flights" class="nav-card">
+      <div class="nav-card-accent accent-purple"></div>
+      <div class="nav-card-body">
+        <div class="nav-card-icon">✈️</div>
+        <div class="nav-card-title">Flights & Logistics</div>
+        <div class="nav-card-desc">All confirmed flight details, confirmation codes, seat assignments, transport options, and the very important note about Milan Linate vs Malpensa.</div>
+      </div>
+      <div class="nav-card-footer">
+        <span>Confirmed · LINATE not MALPENSA</span>
+        <span class="nav-card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="/packing" class="nav-card">
+      <div class="nav-card-accent accent-teal"></div>
+      <div class="nav-card-body">
+        <div class="nav-card-icon">🎒</div>
+        <div class="nav-card-title">Packing List</div>
+        <div class="nav-card-desc">What to pack for 13 days split between a 45ft catamaran, two European cities, and one very early morning Ryanair flight.</div>
+      </div>
+      <div class="nav-card-footer">
+        <span>Sailing + city + Italy</span>
+        <span class="nav-card-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<hr class="section-sep" />
+
+<!-- CREW QUICK VIEW -->
+<div class="section">
+  <div class="section-label">The Crew</div>
+  <h2>Your Fellow Pirates</h2>
+  <p class="section-desc">Seven people who said "yes" to a sailing trip in Greece and are now collectively responsible for not sinking a €500k catamaran.</p>
+
+  <div class="crew-strip">
+    <a href="crew.html#dustin" class="crew-chip">
+      <div class="crew-avatar" style="padding:0;overflow:hidden;"><img src="/img/dustin.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Dustin"></div>
+      <div class="crew-chip-name">Dustin</div>
+      <div class="crew-chip-role">⚓ Captain</div>
+    </a>
+    <a href="crew.html#adam" class="crew-chip">
+      <div class="crew-avatar" style="padding:0;overflow:hidden;"><img src="/img/adam.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Adam"></div>
+      <div class="crew-chip-name">Adam</div>
+      <div class="crew-chip-role">🗺 Nav / Bow</div>
+    </a>
+    <a href="crew.html#jenny" class="crew-chip">
+      <div class="crew-avatar" style="padding:0;overflow:hidden;"><img src="/img/jenny.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Jenny"></div>
+      <div class="crew-chip-name">Jenny</div>
+      <div class="crew-chip-role">🪢 Bow Lines</div>
+    </a>
+    <a href="crew.html#nic" class="crew-chip">
+      <div class="crew-avatar" style="padding:0;overflow:hidden;"><img src="/img/nic.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Nic"></div>
+      <div class="crew-chip-name">Nic</div>
+      <div class="crew-chip-role">⛵ Stern Port</div>
+    </a>
+    <a href="crew.html#fallon" class="crew-chip">
+      <div class="crew-avatar" style="padding:0;overflow:hidden;"><img src="/img/fallon.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Fallon"></div>
+      <div class="crew-chip-name">Fallon</div>
+      <div class="crew-chip-role">⛵ Stern Starb.</div>
+    </a>
+    <a href="crew.html#alicia" class="crew-chip">
+      <div class="crew-avatar" style="padding:0;overflow:hidden;"><img src="/img/alicia.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Alicia"></div>
+      <div class="crew-chip-name">Alicia</div>
+      <div class="crew-chip-role">🪢 Mid / Fenders</div>
+    </a>
+    <a href="crew.html#kathryn" class="crew-chip">
+      <div class="crew-avatar" style="padding:0;overflow:hidden;"><img src="/img/kathryn.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Kathryn"></div>
+      <div class="crew-chip-name">Kathryn</div>
+      <div class="crew-chip-role">🪢 Mid / Fenders</div>
+    </a>
+  </div>
+</div>
+
+<!-- URGENT ITEMS -->
+<hr class="section-sep" />
+<div class="section">
+  <div class="section-label">Action Items</div>
+  <h2>Things That Still Need Doing</h2>
+  <p class="section-desc">As of April 25, 2026. Get these done before June 10.</p>
+
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <div class="alert" style="margin-bottom:0;">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-text"><strong>SIGN NOW:</strong> Sunsail T&amp;C invitation — sign promptly, required before boarding.</div>
+    </div>
+    <div class="alert warn" style="margin-bottom:0;">
+      <div class="alert-icon">📅</div>
+      <div class="alert-text"><strong>BOOK:</strong> Ryanair CFU→BLQ FR5155 (Jun 20, 12:15 AM) · ~$55/person · ryanair.com</div>
+    </div>
+    <div class="alert warn" style="margin-bottom:0;">
+      <div class="alert-icon">🏛</div>
+      <div class="alert-text"><strong>BOOK:</strong> Acropolis tickets at hhticket.gr · 8:00 AM slot Fri Jun 12 · Entry capped at 20,000/day</div>
+    </div>
+    <div class="alert warn" style="margin-bottom:0;">
+      <div class="alert-icon">🏨</div>
+      <div class="alert-text"><strong>BOOK:</strong> Hotels in Athens (Jun 11–12), near Bologna airport (Jun 20), Bologna Airbnb (Jun 20–21), Milan near Centrale (Jun 22)</div>
+    </div>
+    <div class="alert success" style="margin-bottom:0;">
+      <div class="alert-icon">✅</div>
+      <div class="alert-text"><strong>DONE:</strong> Jenny's passport renewed · SKY Express ATH–CFU confirmed · Delta flights confirmed</div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div>⛵ <strong>Grecian Gusts</strong> · Sunsail 454L · Ionian Sea · June 2026</div>
+  <div style="margin-top:6px;">Dustin · Adam · Jenny · Nic · Fallon · Alicia · Kathryn</div>
+  <div style="margin-top:8px;"><em>"The sea is the same as it has been since before men ever went on it in boats." — Hemingway. (Also, watch Module 4.)</em></div>
+</footer>
+
+</body>
+</html>

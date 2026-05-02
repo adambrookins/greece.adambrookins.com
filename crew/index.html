@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="/auth.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Crew · Grecian Gusts 2026</title>
+  <link rel="stylesheet" href="/shared.css" />
+  <style>
+    .crew-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .crew-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+      scroll-margin-top: 70px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .crew-card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.3); }
+
+    .crew-card-header {
+      padding: 24px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-start; gap: 16px;
+    }
+    .crew-avatar-lg {
+      width: 64px; height: 64px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem; font-weight: 700;
+      flex-shrink: 0; border: 2px solid var(--border);
+    }
+    .avatar-gold { background: #2a1a00; border-color: var(--gold); color: var(--gold); }
+    .avatar-sky { background: #001525; border-color: var(--sky); color: var(--sky); }
+    .avatar-terra { background: #2a0e06; border-color: var(--terra); color: var(--terra-light); }
+    .avatar-green { background: #001a0d; border-color: var(--green); color: var(--green); }
+    .avatar-purple { background: #1a0a2a; border-color: #9b59b6; color: #6b4fa0; }
+    .avatar-teal { background: #001a15; border-color: #1abc9c; color: #2a9d8f; }
+    .avatar-rose { background: #2a0018; border-color: #e74c8b; color: #c04060; }
+
+    .crew-header-text { flex: 1; }
+    .crew-name-lg {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; font-weight: 700;
+      color: var(--text); margin-bottom: 3px;
+    }
+    .crew-role-lg {
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .crew-origin { font-size: 0.78rem; color: var(--text-muted); }
+
+    .crew-card-body { padding: 18px 24px; }
+    .crew-bio {
+      font-size: 0.83rem; color: var(--text-dim);
+      line-height: 1.6; margin-bottom: 16px;
+      font-style: italic;
+    }
+    .crew-facts { list-style: none; }
+    .crew-facts li {
+      display: flex; gap: 10px; align-items: flex-start;
+      font-size: 0.79rem; color: var(--text-dim);
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(30,58,95,0.3);
+      line-height: 1.45;
+    }
+    .crew-facts li:last-child { border-bottom: none; }
+    .crew-facts li strong { color: var(--text); }
+    .fact-icon { flex-shrink: 0; }
+
+    .crew-card-footer {
+      padding: 12px 24px;
+      background: rgba(0,0,0,0.15);
+      border-top: 1px solid var(--border);
+      font-size: 0.72rem; color: var(--text-muted);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* Captain card spans full width */
+    .crew-card.captain-card {
+      grid-column: 1 / -1;
+    }
+    .captain-card .crew-card-header {
+      background: linear-gradient(135deg, var(--gold-pale) 0%, transparent 60%);
+    }
+    .captain-card .crew-avatar-lg {
+      width: 80px; height: 80px; font-size: 2rem;
+    }
+    .captain-card .crew-name-lg { font-size: 1.6rem; }
+
+    .pirate-tag {
+      display: inline-block;
+      background: rgba(192,96,58,0.15);
+      border: 1px solid rgba(192,96,58,0.3);
+      color: var(--terra-light);
+      font-size: 0.68rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="/" class="nav-brand">⛵ Grecian <span>Gusts</span></a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/itinerary">Itinerary</a>
+    <a href="/sailing">Sailing Days</a>
+    <a href="/crew" class="active">Crew</a>
+    <a href="/training">Training</a>
+    <a href="/flights">Flights</a>
+    <a href="/packing">Packing</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-eyebrow">7 Crew · 1 Catamaran · Infinite Feta</div>
+  <h1>The <em>Crew</em></h1>
+  <p>Assembled from Minneapolis, Seattle, Phoenix, and Chicago. United by a shared love of Greece, a complete lack of sailing experience, and one very capable captain.</p>
+</div>
+
+<div class="section">
+  <div class="alert" style="background:rgba(245,158,11,0.08); border-color:rgba(212,134,10,0.3);">
+    <div class="alert-icon">🏴‍☠️</div>
+    <div class="alert-text" style="color: var(--gold);">
+      <strong style="color:var(--gold);">A note on piracy:</strong> The Ionian Sea was historically thick with pirates. This crew is historically thick with people who have never tied a bowline. Same energy, different century. Watch the training videos.
+    </div>
+  </div>
+
+  <div class="crew-grid">
+
+    <!-- CAPTAIN -->
+    <div class="crew-card captain-card" id="dustin">
+      <div class="crew-card-header">
+        <div class="crew-avatar-lg" style="background:none;border:none;padding:0;overflow:hidden;"><img src="/img/dustin.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Dustin"></div>
+        <div class="crew-header-text">
+          <div class="crew-name-lg">Dustin Embrey</div>
+          <div class="crew-role-lg text-gold">⚓ Captain</div>
+          <div class="crew-origin">📍 Seattle, WA</div>
+          <div class="pirate-tag">🏴‍☠️ Captain of the Grecian Gusts</div>
+        </div>
+      </div>
+      <div class="crew-card-body">
+        <div class="crew-bio">"The man with the plan, the license, and the final word on absolutely everything that happens aboard. If Dustin says we're leaving at 7 AM, we are leaving at 7 AM. Your bladder is not a negotiating partner."</div>
+        <ul class="crew-facts">
+          <li><span class="fact-icon">⚓</span> <span><strong>Role:</strong> Helm, navigation, all maneuvers, routing, weather decisions, final authority on all things.</span></li>
+          <li><span class="fact-icon">✈️</span> <span><strong>Getting there:</strong> Flying Condor SEA→CFU via Frankfurt. Arrives Corfu Jun 12 evening — one day early.</span></li>
+          <li><span class="fact-icon">🗓</span> <span><strong>Departure:</strong> Dustin leaves from Rome (FCO) on Jun 27 — he gets a bonus Italy week.</span></li>
+          <li><span class="fact-icon">📋</span> <span><strong>Critical note:</strong> Sunsail T&amp;C invitation sent by Dustin to all crew. If you haven't signed, sign now.</span></li>
+        </ul>
+      </div>
+      <div class="crew-card-footer">Booking: Condor · 15562724 · SEA→FRA→CFU → Rome</div>
+    </div>
+
+    <!-- ADAM -->
+    <div class="crew-card" id="adam">
+      <div class="crew-card-header">
+        <div class="crew-avatar-lg" style="background:none;border:none;padding:0;overflow:hidden;"><img src="/img/adam.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Adam"></div>
+        <div class="crew-header-text">
+          <div class="crew-name-lg">Adam Brookins</div>
+          <div class="crew-role-lg text-sky">🗺 Navigation / Bow</div>
+          <div class="crew-origin">📍 Minneapolis, MN</div>
+        </div>
+      </div>
+      <div class="crew-card-body">
+        <div class="crew-bio">"The man who planned this entire trip and definitely knows what a chartplotter is. He booked the flights, organised the doc, and will now stand on the bow calling out depths while pretending he did this in a past life."</div>
+        <ul class="crew-facts">
+          <li><span class="fact-icon">🗺</span> <span><strong>Role:</strong> Chartplotter &amp; depth watch, anchor windlass, bow lines, calls distance to helm.</span></li>
+          <li><span class="fact-icon">✈️</span> <span><strong>Flights:</strong> Delta DL2649 + DL240, MSP→BOS→ATH. Seat 18D / 7C. Conf: G5ME5W.</span></li>
+          <li><span class="fact-icon">🏛</span> <span><strong>Athens plan:</strong> Exploring with Jenny and Kathryn. Acropolis booked 8 AM Jun 12.</span></li>
+        </ul>
+      </div>
+      <div class="crew-card-footer">adambrookins@gmail.com · 763.227.1777</div>
+    </div>
+
+    <!-- JENNY -->
+    <div class="crew-card" id="jenny">
+      <div class="crew-card-header">
+        <div class="crew-avatar-lg" style="background:none;border:none;padding:0;overflow:hidden;"><img src="/img/jenny.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Jenny"></div>
+        <div class="crew-header-text">
+          <div class="crew-name-lg">Jenny Brookins</div>
+          <div class="crew-role-lg text-terra">🪢 Bow / Lines</div>
+          <div class="crew-origin">📍 Minneapolis, MN</div>
+        </div>
+      </div>
+      <div class="crew-card-body">
+        <div class="crew-bio">"Jenny got her passport renewed specifically for this trip. It arrived January 29, 2026. She is cleared for travel and ready to operate a boathook. These two facts are equally impressive."</div>
+        <ul class="crew-facts">
+          <li><span class="fact-icon">🪢</span> <span><strong>Role:</strong> Boathook (lazy lines), bow line handling, fender deployment, bridle assist.</span></li>
+          <li><span class="fact-icon">✈️</span> <span><strong>Flights:</strong> SKY Express ATH→CFU seat 2C. Conf: USJZNE. Delta return confirmed.</span></li>
+          <li><span class="fact-icon">✅</span> <span><strong>Status:</strong> Passport renewed (A71038220, expires Jan 2036). Cleared for adventure.</span></li>
+        </ul>
+      </div>
+      <div class="crew-card-footer">jenny.murray6@gmail.com · 507.398.7352</div>
+    </div>
+
+    <!-- NIC -->
+    <div class="crew-card" id="nic">
+      <div class="crew-card-header">
+        <div class="crew-avatar-lg" style="background:none;border:none;padding:0;overflow:hidden;"><img src="/img/nic.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Nic"></div>
+        <div class="crew-header-text">
+          <div class="crew-name-lg">Nic Anderson</div>
+          <div class="crew-role-lg" style="color:#c39bd3;">⛵ Stern Port</div>
+          <div class="crew-origin">📍 Phoenix, AZ</div>
+        </div>
+      </div>
+      <div class="crew-card-body">
+        <div class="crew-bio">"Nic holds the port stern line and the team morale in equal measure. A natural at standing on the stern looking confident, which is 80% of what docking requires."</div>
+        <ul class="crew-facts">
+          <li><span class="fact-icon">⛵</span> <span><strong>Role:</strong> Port stern line ashore, port fender during docking, Med mooring assist, swim ladder.</span></li>
+          <li><span class="fact-icon">🌊</span> <span><strong>Specialty:</strong> Stepping ashore without jumping. Crucial skill. See Module 2.</span></li>
+        </ul>
+      </div>
+      <div class="crew-card-footer">nicjanderson@gmail.com · 480.444.8636</div>
+    </div>
+
+    <!-- FALLON -->
+    <div class="crew-card" id="fallon">
+      <div class="crew-card-header">
+        <div class="crew-avatar-lg" style="background:none;border:none;padding:0;overflow:hidden;"><img src="/img/fallon.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Fallon"></div>
+        <div class="crew-header-text">
+          <div class="crew-name-lg">Fallon Jarboe</div>
+          <div class="crew-role-lg" style="color:#f1948a;">⛵ Stern Starboard</div>
+          <div class="crew-origin">📍 Chicago, IL</div>
+        </div>
+      </div>
+      <div class="crew-card-body">
+        <div class="crew-bio">"Fallon is on starboard stern, which is the right side of the boat when you're facing forward — a fact she will know by Day 3. Possibly Day 2. She has excellent fender instincts."</div>
+        <ul class="crew-facts">
+          <li><span class="fact-icon">⛵</span> <span><strong>Role:</strong> Starboard stern line ashore, starboard fender, Med mooring assist, swim ladder.</span></li>
+          <li><span class="fact-icon">📍</span> <span><strong>Pro tip:</strong> Starboard = right when facing forward. Port = left. Red = port. That's the whole class.</span></li>
+        </ul>
+      </div>
+      <div class="crew-card-footer">fjarboe14@gmail.com · 708.267.8201</div>
+    </div>
+
+    <!-- ALICIA -->
+    <div class="crew-card" id="alicia">
+      <div class="crew-card-header">
+        <div class="crew-avatar-lg" style="background:none;border:none;padding:0;overflow:hidden;"><img src="/img/alicia.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Alicia"></div>
+        <div class="crew-header-text">
+          <div class="crew-name-lg">Alicia Wen</div>
+          <div class="crew-role-lg" style="color:#76d7c4;">🪢 Mid / Fenders</div>
+          <div class="crew-origin">📍 Seattle, WA</div>
+        </div>
+      </div>
+      <div class="crew-card-body">
+        <div class="crew-bio">"Alicia manages the fenders and the morale. Both require constant adjustment. She can be deployed to bow or stern as conditions demand, which makes her the most versatile crew member and the person who does the most walking on a 45-foot boat."</div>
+        <ul class="crew-facts">
+          <li><span class="fact-icon">🪢</span> <span><strong>Role:</strong> Fender management both sides, line coiling &amp; stowage, assist bow or stern, relay distance calls.</span></li>
+          <li><span class="fact-icon">📏</span> <span><strong>Key skill:</strong> Calling distance to the helm. "3 meters" not "pretty close" not "uhh." Just meters.</span></li>
+        </ul>
+      </div>
+      <div class="crew-card-footer">awen14@gmail.com · 206.612.7623</div>
+    </div>
+
+    <!-- KATHRYN -->
+    <div class="crew-card" id="kathryn">
+      <div class="crew-card-header">
+        <div class="crew-avatar-lg" style="background:none;border:none;padding:0;overflow:hidden;"><img src="/img/kathryn.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Kathryn"></div>
+        <div class="crew-header-text">
+          <div class="crew-name-lg">Kathryn Tschida</div>
+          <div class="crew-role-lg text-green">🪢 Mid / Fenders</div>
+          <div class="crew-origin">📍 Minneapolis, MN</div>
+        </div>
+      </div>
+      <div class="crew-card-body">
+        <div class="crew-bio">"Kathryn is the second member of the elite mid-ship fender corps. She flew ATH→CFU on the early SKY Express, which means she's had the least sleep and the most commitment of anyone aboard."</div>
+        <ul class="crew-facts">
+          <li><span class="fact-icon">🪢</span> <span><strong>Role:</strong> Fender management, line coiling, assist as needed, relay calls to helm.</span></li>
+          <li><span class="fact-icon">✈️</span> <span><strong>Flights:</strong> SKY Express seat 2B (middle). Conf: USJZNE. Delta return confirmed.</span></li>
+        </ul>
+      </div>
+      <div class="crew-card-footer">ktschida09@gmail.com · 320.493.5507</div>
+    </div>
+
+  </div>
+</div>
+
+<hr class="section-sep" />
+
+<!-- VOICE CALLS REFERENCE -->
+<div class="section">
+  <div class="section-label">Quick Reference</div>
+  <h2>Commands Every Crew Member Must Know</h2>
+  <p class="section-desc">When the captain calls something, you respond instantly. No questions, no "wait what does that mean." Learn these before boarding.</p>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px;">
+    <div class="card card-sky" style="padding: 16px 18px;">
+      <div class="text-sky" style="font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">Captain Calls</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;border-bottom:1px solid var(--border);padding-bottom:6px;"><span class="text-dim">"Fenders out"</span><span class="text-green font-weight:600">Deploy now</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;border-bottom:1px solid var(--border);padding-bottom:6px;"><span class="text-dim">"Lines ready"</span><span style="color:#fcd34d">Hold, don't release</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;border-bottom:1px solid var(--border);padding-bottom:6px;"><span class="text-dim">"Let go"</span><span style="color:#fb923c">Release that line</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;border-bottom:1px solid var(--border);padding-bottom:6px;"><span class="text-dim">"Hold!"</span><span style="color:#ef4444">Stop everything</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;"><span class="text-dim">"All fast"</span><span class="text-green">Secured — done</span></div>
+      </div>
+    </div>
+    <div class="card card-terra" style="padding: 16px 18px;">
+      <div class="text-terra" style="font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">Golden Rules</div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:0.8rem;color:var(--text-dim);">
+        <div>⚓ <strong style="color:var(--text)">One voice runs the boat.</strong> Only the captain calls actions during maneuvers.</div>
+        <div>🚫 <strong style="color:var(--text)">Never jump ashore.</strong> Step. If you can't step, boat isn't close enough.</div>
+        <div>🦺 <strong style="color:var(--text)">Fenders before approach.</strong> Not during. Before.</div>
+        <div>🤫 <strong style="color:var(--text)">Silence during docking.</strong> Only report hazards. Never give helm instructions.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div>⛵ <strong>Grecian Gusts</strong> · Sunsail 454L · Ionian Sea · June 2026</div>
+  <div style="margin-top:6px;"><a href="/">← Back to Home</a> · <a href="/training">Training →</a></div>
+</footer>
+
+</body>
+</html>

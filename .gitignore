@@ -1,0 +1,8 @@
+.DS_Store
+img/*_v*.png
+img/*_t.png
+img/*_t2.png
+img/dustin_test*.png
+img/debug_grid.png
+img/grid_*.png
+theme-explorer.html

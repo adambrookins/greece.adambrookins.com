@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grecian Gusts · Crew Only</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=Karla:wght@400;600;700&display=swap" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:     #1b4f8a;
+      --navy-dk:  #0d2a50;
+      --gold:     #d4860a;
+      --gold-lt:  #f0a830;
+      --text:     #1a1208;
+      --text-dim: #5a4e3a;
+      --bg:       #f7f3ec;
+    }
+
+    body {
+      font-family: 'Karla', system-ui, sans-serif;
+      background: var(--navy-dk);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── ANIMATED OCEAN BACKGROUND ── */
+    .ocean {
+      position: fixed; inset: 0; z-index: 0;
+      background: linear-gradient(180deg, #0a1e3c 0%, #0d3060 40%, #1a5a8a 75%, #2a80b0 100%);
+    }
+
+    .stars {
+      position: fixed; inset: 0; z-index: 1;
+      background-image:
+        radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 25% 8%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 40% 20%, rgba(255,255,255,0.7) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 5%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 75% 12%, rgba(255,255,255,0.6) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 88% 18%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 15% 35%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 30%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 92% 25%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 30% 10%, rgba(255,255,255,0.6) 0%, transparent 100%);
+    }
+
+    /* Waves */
+    .waves {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      z-index: 2; height: 120px; overflow: hidden;
+    }
+    .wave {
+      position: absolute; bottom: 0; left: -50%;
+      width: 200%; height: 100px;
+      border-radius: 44% 56% 44% 56%;
+      animation: waveAnim 8s linear infinite;
+    }
+    .wave-1 { background: rgba(255,255,255,0.06); animation-duration: 8s; }
+    .wave-2 { background: rgba(255,255,255,0.04); animation-duration: 11s; animation-delay: -3s; }
+    .wave-3 { background: rgba(255,255,255,0.03); animation-duration: 14s; animation-delay: -6s; }
+
+    @keyframes waveAnim {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ── CARD ── */
+    .gate-card {
+      position: relative; z-index: 10;
+      background: var(--bg);
+      border-radius: 20px;
+      padding: 48px 40px 40px;
+      width: min(420px, calc(100vw - 32px));
+      text-align: center;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08);
+      animation: cardIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(24px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .lock-icon {
+      font-size: 2.8rem;
+      margin-bottom: 16px;
+      display: block;
+      animation: bobble 3s ease-in-out infinite;
+    }
+    @keyframes bobble {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-5px); }
+    }
+
+    .gate-eyebrow {
+      font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 8px;
+    }
+
+    .gate-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem; font-weight: 700; font-style: italic;
+      color: var(--navy-dk); line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .gate-title em { font-style: normal; color: var(--gold); }
+
+    .gate-subtitle {
+      font-size: 0.83rem; color: var(--text-dim);
+      line-height: 1.55; margin-bottom: 32px;
+    }
+
+    /* ── FORM ── */
+    .form-group { position: relative; margin-bottom: 14px; }
+
+    .pw-input {
+      width: 100%;
+      padding: 14px 48px 14px 18px;
+      font-family: 'Karla', sans-serif;
+      font-size: 1rem; font-weight: 600;
+      letter-spacing: 0.12em;
+      background: white;
+      border: 2px solid rgba(26,79,138,0.2);
+      border-radius: 10px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      text-align: center;
+    }
+    .pw-input::placeholder { letter-spacing: 0.08em; font-weight: 400; color: #aaa; }
+    .pw-input:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(26,79,138,0.12);
+    }
+    .pw-input.error {
+      border-color: #b03030;
+      box-shadow: 0 0 0 3px rgba(176,48,48,0.1);
+      animation: shake 0.4s ease;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%       { transform: translateX(-8px); }
+      40%       { transform: translateX(8px); }
+      60%       { transform: translateX(-5px); }
+      80%       { transform: translateX(5px); }
+    }
+
+    .toggle-pw {
+      position: absolute; right: 14px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      font-size: 1rem; color: #aaa; padding: 4px;
+      transition: color 0.15s;
+    }
+    .toggle-pw:hover { color: var(--navy); }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--navy);
+      color: white;
+      border: none; border-radius: 10px;
+      font-family: 'Karla', sans-serif;
+      font-size: 0.88rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px rgba(26,79,138,0.3);
+    }
+    .submit-btn:hover {
+      background: #0d3060;
+      box-shadow: 0 6px 20px rgba(26,79,138,0.4);
+    }
+    .submit-btn:active { transform: scale(0.98); }
+
+    .error-msg {
+      font-size: 0.77rem; color: #b03030;
+      margin-top: 10px; min-height: 20px;
+      font-weight: 600;
+    }
+
+    /* ── HINT ── */
+    .hint {
+      margin-top: 24px;
+      padding: 12px 16px;
+      background: rgba(26,79,138,0.06);
+      border: 1px solid rgba(26,79,138,0.12);
+      border-radius: 8px;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+    .hint strong { color: var(--navy); }
+
+    /* ── FOOTER ── */
+    .gate-footer {
+      position: fixed; bottom: 16px; z-index: 10;
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.3);
+      font-family: 'Karla', sans-serif;
+      letter-spacing: 0.06em;
+    }
+  </style>
+</head>
+<body>
+
+<div class="ocean"></div>
+<div class="stars"></div>
+<div class="waves">
+  <div class="wave wave-1"></div>
+  <div class="wave wave-2"></div>
+  <div class="wave wave-3"></div>
+</div>
+
+<div class="gate-card">
+  <span class="lock-icon">🏴‍☠️</span>
+  <div class="gate-eyebrow">Crew Access Only</div>
+  <div class="gate-title"><em>Grecian</em> Gusts</div>
+  <p class="gate-subtitle">This voyage is for crew members only.<br>Enter the password to board.</p>
+
+  <form id="gate-form" autocomplete="off">
+    <div class="form-group">
+      <input
+        id="pw-field"
+        type="password"
+        class="pw-input"
+        placeholder="Enter password"
+        autofocus
+        autocomplete="new-password"
+      />
+      <button type="button" class="toggle-pw" id="toggle-btn" aria-label="Show password">👁</button>
+    </div>
+    <button type="submit" class="submit-btn">⛵ &nbsp; Come Aboard</button>
+    <div class="error-msg" id="error-msg"></div>
+  </form>
+
+  <div class="hint">
+    🗝 <strong>Hint:</strong> What do you call someone who sails under the Jolly Roger and definitely knows what a lazy line is?
+  </div>
+</div>
+
+<div class="gate-footer">⛵ &nbsp; Grecian Gusts · June 2026 · Ionian Sea</div>
+
+<script>
+  const form     = document.getElementById('gate-form');
+  const input    = document.getElementById('pw-field');
+  const errorMsg = document.getElementById('error-msg');
+  const toggleBtn = document.getElementById('toggle-btn');
+
+  // Show/hide password
+  toggleBtn.addEventListener('click', function () {
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    toggleBtn.textContent = isHidden ? '🙈' : '👁';
+  });
+
+  // Get redirect target from URL params
+  function getNextPage() {
+    const params = new URLSearchParams(location.search);
+    const next = params.get('next');
+    // Only allow root-relative paths (e.g. /crew, /training, /)
+    if (next && /^\/[\w\-\/]*$/.test(next)) return next;
+    return '/';
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const val = input.value.trim().toLowerCase();
+
+    if (val === 'pirate') {
+      // Authenticated — set session flag and redirect
+      sessionStorage.setItem('gg_auth', '1');
+      window.location.replace(getNextPage());
+    } else {
+      // Wrong password
+      input.classList.add('error');
+      errorMsg.textContent = '🚫 Wrong password. Try again, landlubber.';
+      input.value = '';
+      input.focus();
+      setTimeout(() => input.classList.remove('error'), 600);
+    }
+  });
+
+  // Clear error on typing
+  input.addEventListener('input', function () {
+    errorMsg.textContent = '';
+  });
+
+  // If already authenticated, skip login
+  if (sessionStorage.getItem('gg_auth')) {
+    window.location.replace(getNextPage());
+  }
+</script>
+</body>
+</html>

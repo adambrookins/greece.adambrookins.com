@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="/auth.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Full Itinerary · Grecian Gusts 2026</title>
+  <link rel="stylesheet" href="/shared.css" />
+  <style>
+    .phase-block { margin-bottom: 48px; }
+    .phase-label {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 16px;
+    }
+    .phase-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .phase-icon.athens { background: var(--gold-pale); border: 1px solid rgba(212,134,10,0.3); }
+    .phase-icon.sailing { background: var(--navy-pale); border: 1px solid rgba(26,79,138,0.3); }
+    .phase-icon.italy { background: var(--gold-pale); border: 1px solid rgba(212,134,10,0.3); }
+
+    .phase-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; font-weight: 700; color: var(--text);
+    }
+    .phase-dates { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+    .day-row {
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 10px; box-shadow: var(--shadow);
+    }
+    .day-row-header {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      align-items: stretch;
+    }
+    .day-row-date {
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      padding: 14px 16px;
+      display: flex; flex-direction: column;
+      justify-content: center;
+    }
+    .day-row-weekday { font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+    .day-row-date-num { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--text); line-height: 1; }
+    .day-row-month { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+    .day-row-main { padding: 14px 18px; }
+    .day-row-location {
+      font-size: 0.63rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 3px;
+    }
+    .day-row-title { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .day-row-items { display: flex; flex-direction: column; gap: 4px; }
+    .day-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: 0.79rem; color: var(--text-dim); line-height: 1.4;
+    }
+    .day-item-time {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem; color: var(--text-muted);
+      flex-shrink: 0; min-width: 48px;
+    }
+    .day-item.warn .day-item-time { color: var(--red); }
+    .day-item.warn .day-item-content { color: #7a2000; }
+    .day-item.good .day-item-time { color: var(--green); }
+    .day-item.good .day-item-content { color: #1a5c35; }
+    .day-item-content strong { color: var(--text); }
+
+    .conf-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--green-pale); border: 1px solid rgba(46,125,79,0.3); color: var(--green); font-size: 0.65rem; font-weight: 700;
+      padding: 2px 8px; border-radius: 8px;
+      font-family: 'DM Mono', monospace; letter-spacing: 0.05em;
+    }
+    .conf-badge.pending { background: #1c0a00; border-color: #7c2d12; color: #fca5a5; }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="/" class="nav-brand">⛵ Grecian <span>Gusts</span></a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/itinerary" class="active">Itinerary</a>
+    <a href="/sailing">Sailing Days</a>
+    <a href="/crew">Crew</a>
+    <a href="/training">Training</a>
+    <a href="/flights">Flights</a>
+    <a href="/packing">Packing</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-eyebrow">Jun 10–23, 2026 · Full Trip Timeline</div>
+  <h1>The <em>Itinerary</em></h1>
+  <p>Minneapolis → Athens → Corfu → Ionian Islands → Bologna → Milan → Minneapolis. 13 days, every detail.</p>
+</div>
+
+<div class="section">
+
+  <!-- PHASE 1: TRAVEL -->
+  <div class="phase-block">
+    <div class="phase-label">
+      <div class="phase-icon athens">✈️</div>
+      <div><div class="phase-title">Getting There</div><div class="phase-dates">Wed Jun 10 – Thu Jun 11</div></div>
+    </div>
+
+    <div class="day-row">
+      <div class="day-row-header">
+        <div class="day-row-date"><div class="day-row-weekday">Wed</div><div class="day-row-date-num">10</div><div class="day-row-month">Jun</div></div>
+        <div class="day-row-main">
+          <div class="day-row-location">Minneapolis → Boston → Athens</div>
+          <div class="day-row-title">Departure Day <span class="conf-badge">✓ G5ME5W</span></div>
+          <div class="day-row-items">
+            <div class="day-item warn"><div class="day-item-time">6:55 AM</div><div class="day-item-content"><strong>DL2649</strong> MSP → BOS · Seat 18D · Arrives 10:45 AM</div></div>
+            <div class="day-item"><div class="day-item-time">3:25 PM</div><div class="day-item-content"><strong>DL240</strong> BOS → ATH · Seat 7C · Overnight</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-row">
+      <div class="day-row-header">
+        <div class="day-row-date"><div class="day-row-weekday">Thu</div><div class="day-row-date-num">11</div><div class="day-row-month">Jun</div></div>
+        <div class="day-row-main">
+          <div class="day-row-location">Athens, Greece</div>
+          <div class="day-row-title">Arrive Athens · Explore Plaka <span class="conf-badge pending">BOOK Hotel</span></div>
+          <div class="day-row-items">
+            <div class="day-item"><div class="day-item-time">7:35 AM</div><div class="day-item-content"><strong>Arrive ATH.</strong> Metro Line 3 → Monastiraki (~40 min, ~€10)</div></div>
+            <div class="day-item"><div class="day-item-time">9:00 AM</div><div class="day-item-content">Check in hotel near Plaka. Drop bags. Sleep 2–3 hours.</div></div>
+            <div class="day-item"><div class="day-item-time">2:00 PM</div><div class="day-item-content">Monastiraki + Ancient Agora — flea market, street food, outdoor cafes</div></div>
+            <div class="day-item"><div class="day-item-time">4:00 PM</div><div class="day-item-content">Anafiotika — whitewashed neighbourhood hugging the Acropolis base</div></div>
+            <div class="day-item"><div class="day-item-time">7:00 PM</div><div class="day-item-content"><strong>Dinner: Scholarhio</strong> — traditional Greek small plates in Plaka. Fixed €20 menu. (Closed Tuesdays — Thursday fine.)</div></div>
+            <div class="day-item"><div class="day-item-time">9:00 PM</div><div class="day-item-content">Evening stroll in Plaka. Early night — Acropolis at 8 AM tomorrow.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2: ATHENS -->
+  <div class="phase-block">
+    <div class="phase-label">
+      <div class="phase-icon athens">🏛</div>
+      <div><div class="phase-title">Athens — Acropolis Day</div><div class="phase-dates">Fri Jun 12</div></div>
+    </div>
+
+    <div class="day-row">
+      <div class="day-row-header">
+        <div class="day-row-date"><div class="day-row-weekday">Fri</div><div class="day-row-date-num">12</div><div class="day-row-month">Jun</div></div>
+        <div class="day-row-main">
+          <div class="day-row-location">Athens, Greece</div>
+          <div class="day-row-title">Acropolis Day · Last Full Day <span class="conf-badge pending">BOOK hhticket.gr</span></div>
+          <div class="day-row-items">
+            <div class="day-item warn"><div class="day-item-time">7:45 AM</div><div class="day-item-content"><strong>At gate, Acropolis.</strong> €30 entry. 8 AM time slot. Book at hhticket.gr — capped at 20,000/day.</div></div>
+            <div class="day-item"><div class="day-item-time">10:30 AM</div><div class="day-item-content"><strong>Acropolis Museum</strong> — €20 entry. Parthenon friezes, Caryatids. Allow 90 min. Book at etickets.theacropolismuseum.gr.</div></div>
+            <div class="day-item"><div class="day-item-time">12:30 PM</div><div class="day-item-content">Syntagma Square — Changing of the Guard, Tomb of the Unknown Soldier (every hour on the hour)</div></div>
+            <div class="day-item"><div class="day-item-time">2:00 PM</div><div class="day-item-content">Lunch + afternoon free. Plaka shopping, rooftop bar with Acropolis view.</div></div>
+            <div class="day-item"><div class="day-item-time">6:00 PM</div><div class="day-item-content"><strong>Philopappos Hill</strong> — best sunset view in Athens. 15 min walk from Acropolis. Far fewer crowds than Lycabettus.</div></div>
+            <div class="day-item"><div class="day-item-time">7:30 PM</div><div class="day-item-content"><strong>Dinner: Aerides Plaka</strong> — grilled octopus, moussaka. Highly rated. Outdoor seating.</div></div>
+            <div class="day-item warn"><div class="day-item-time">9:30 PM</div><div class="day-item-content"><strong>Return to hotel. Alarm: 4:15 AM. Hotel departure: 5:00 AM.</strong> Flight 6:35 AM.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3: SAILING -->
+  <div class="phase-block">
+    <div class="phase-label">
+      <div class="phase-icon sailing">⛵</div>
+      <div><div class="phase-title">The Sailing Week</div><div class="phase-dates">Sat Jun 13 – Sat Jun 20</div></div>
+    </div>
+
+    <div class="day-row">
+      <div class="day-row-header">
+        <div class="day-row-date"><div class="day-row-weekday">Sat</div><div class="day-row-date-num">13</div><div class="day-row-month">Jun</div></div>
+        <div class="day-row-main">
+          <div class="day-row-location">Athens → Corfu · Board</div>
+          <div class="day-row-title">Fly to Corfu · Board Catamaran <span class="conf-badge">✓ USJZNE</span></div>
+          <div class="day-row-items">
+            <div class="day-item warn"><div class="day-item-time">5:00 AM</div><div class="day-item-content">Hotel departure for ATH airport</div></div>
+            <div class="day-item"><div class="day-item-time">6:35 AM</div><div class="day-item-content"><strong>GQ270</strong> ATH → CFU · SKY Express · Seats 2A/2B/2C · Arrives 7:50 AM</div></div>
+            <div class="day-item"><div class="day-item-time">6:00 PM</div><div class="day-item-content"><strong>Board Sunsail 454L at Kontokali, Gouvia Marina.</strong> Sign T&amp;C, provision, settle in.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-row">
+      <div class="day-row-header">
+        <div class="day-row-date"><div class="day-row-weekday">Sun–Fri</div><div class="day-row-date-num">14–19</div><div class="day-row-month">Jun</div></div>
+        <div class="day-row-main">
+          <div class="day-row-location">Ionian Sea · Corfu · Paxos · Mainland</div>
+          <div class="day-row-title">Sailing Days 2–7</div>
+          <div class="day-row-items">
+            <div class="day-item"><div class="day-item-time">Jun 14</div><div class="day-item-content"><strong>Day 2:</strong> Corfu Old Town, Mandraki Harbor (~1.5 hrs)</div></div>
+            <div class="day-item"><div class="day-item-time">Jun 15</div><div class="day-item-content"><strong>Day 3:</strong> Paxos, Lakka Bay (~2.5 hrs) · sea caves · Antipaxos option</div></div>
+            <div class="day-item"><div class="day-item-time">Jun 16</div><div class="day-item-content"><strong>Day 4:</strong> Parga, Mainland Greece (~3 hrs) · Venetian castle · Panagia Island</div></div>
+            <div class="day-item"><div class="day-item-time">Jun 17</div><div class="day-item-content"><strong>Day 5:</strong> Sivota Mourtos (~2 hrs) · Blue Lagoon · Bella Vraka Beach</div></div>
+            <div class="day-item"><div class="day-item-time">Jun 18</div><div class="day-item-content"><strong>Day 6:</strong> Plataria, Mainland Greece (~1.5 hrs) · quiet fishing village</div></div>
+            <div class="day-item warn"><div class="day-item-time">Jun 19</div><div class="day-item-content"><strong>Day 7:</strong> Return to Corfu (~2.5 hrs) · final night aboard · Depart marina 10:30 PM</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-row">
+      <div class="day-row-header">
+        <div class="day-row-date"><div class="day-row-weekday">Sat</div><div class="day-row-date-num">20</div><div class="day-row-month">Jun</div></div>
+        <div class="day-row-main">
+          <div class="day-row-location">Corfu → Bologna</div>
+          <div class="day-row-title">Off Boat · Fly to Bologna <span class="conf-badge pending">BOOK FR5155</span></div>
+          <div class="day-row-items">
+            <div class="day-item warn"><div class="day-item-time">12:15 AM</div><div class="day-item-content"><strong>Ryanair FR5155</strong> CFU → BLQ · ~$55/person · Arrives 1:00 AM BLQ</div></div>
+            <div class="day-item"><div class="day-item-time">10:00 AM</div><div class="day-item-content">Off boat. Check out of charter. Day in Corfu if energy allows.</div></div>
+            <div class="day-item"><div class="day-item-time">1:00 AM</div><div class="day-item-content">Arrive Bologna airport · Taxi ~10 min to hotel near BLQ · Sleep only.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 4: ITALY -->
+  <div class="phase-block">
+    <div class="phase-label">
+      <div class="phase-icon italy">🍝</div>
+      <div><div class="phase-title">The Italy Bonus Round</div><div class="phase-dates">Sat Jun 20 – Tue Jun 23</div></div>
+    </div>
+
+    <div class="day-row">
+      <div class="day-row-header">
+        <div class="day-row-date"><div class="day-row-weekday">Sat–Sun</div><div class="day-row-date-num">20–21</div><div class="day-row-month">Jun</div></div>
+        <div class="day-row-main">
+          <div class="day-row-location">Bologna, Italy</div>
+          <div class="day-row-title">Bologna Days <span class="conf-badge pending">BOOK Airbnb</span></div>
+          <div class="day-row-items">
+            <div class="day-item"><div class="day-item-time">Day 1</div><div class="day-item-content">Check into Airbnb near/in Bologna. Explore city, food, Piazza Maggiore. Sleep after Ryanair chaos.</div></div>
+            <div class="day-item"><div class="day-item-time">Day 2</div><div class="day-item-content">Full day in Bologna. Quadrilatero food market, tortellini, aperitivo culture. Do not leave without eating.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-row">
+      <div class="day-row-header">
+        <div class="day-row-date"><div class="day-row-weekday">Mon</div><div class="day-row-date-num">22</div><div class="day-row-month">Jun</div></div>
+        <div class="day-row-main">
+          <div class="day-row-location">Bologna → Milan</div>
+          <div class="day-row-title">Train to Milan <span class="conf-badge pending">BOOK Train</span></div>
+          <div class="day-row-items">
+            <div class="day-item"><div class="day-item-time">Train</div><div class="day-item-content"><strong>Frecciarossa</strong> Bologna Centrale → Milano Centrale · ~1 hr · From €15. Book trenitalia.com</div></div>
+            <div class="day-item"><div class="day-item-time">Afternoon</div><div class="day-item-content">Afternoon/evening in Milan. Hotel near Centrale for Metro M4 access to Linate tomorrow.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-row">
+      <div class="day-row-header">
+        <div class="day-row-date"><div class="day-row-weekday">Tue</div><div class="day-row-date-num">23</div><div class="day-row-month">Jun</div></div>
+        <div class="day-row-main">
+          <div class="day-row-location">Milan → Minneapolis</div>
+          <div class="day-row-title">Home Day <span class="conf-badge">✓ G5ME5W</span></div>
+          <div class="day-row-items">
+            <div class="day-item warn"><div class="day-item-time">9:00 AM</div><div class="day-item-content">Depart hotel. Metro M4 from Centrale → Linate (~30 min). <strong>LINATE (LIN) — NOT MALPENSA.</strong></div></div>
+            <div class="day-item"><div class="day-item-time">12:20 PM</div><div class="day-item-content"><strong>DL8328</strong> (Air France) LIN → CDG · Seat 41E · Arrives 1:55 PM</div></div>
+            <div class="day-item"><div class="day-item-time">3:45 PM</div><div class="day-item-content"><strong>DL8753</strong> (Air France) CDG → MSP · Seat 41E · Arrives 5:50 PM</div></div>
+            <div class="day-item good"><div class="day-item-time">5:50 PM</div><div class="day-item-content"><strong>Home. MSP.</strong> You did it.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <div>⛵ <strong>Grecian Gusts</strong> · June 2026</div>
+  <div style="margin-top:6px;"><a href="/">← Home</a> · <a href="/sailing">Sailing Days →</a></div>
+</footer>
+</body>
+</html>
