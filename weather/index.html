@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="/auth.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather · Grecian Gusts 2026</title>
+  <link rel="stylesheet" href="/shared.css" />
+  <style>
+    .wx-tabs {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+    }
+    .wx-tab {
+      padding: 7px 18px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;
+      border: 1px solid var(--border); background: var(--card); color: var(--text-dim);
+      cursor: pointer; transition: all 0.15s; user-select: none;
+    }
+    .wx-tab.active {
+      background: var(--navy); border-color: var(--navy); color: white;
+    }
+    .wx-panel { display: none; }
+    .wx-panel.active { display: block; }
+
+    /* Windy embed */
+    .wind-map-wrap {
+      border-radius: 14px; overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      margin-bottom: 28px;
+      position: relative;
+    }
+    .wind-map-wrap iframe {
+      display: block; width: 100%; height: 500px; border: none;
+    }
+    .wind-map-label {
+      position: absolute; top: 12px; left: 12px; z-index: 10;
+      background: rgba(13,42,80,0.85); color: white;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 5px 12px; border-radius: 8px;
+      backdrop-filter: blur(4px);
+      pointer-events: none;
+    }
+
+    /* Forecast day cards */
+    .forecast-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .fc-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px 14px;
+      box-shadow: var(--shadow); text-align: center;
+      transition: transform 0.15s;
+    }
+    .fc-card:hover { transform: translateY(-2px); }
+    .fc-card.sailing { border-top: 3px solid var(--navy); }
+    .fc-card.land { border-top: 3px solid var(--gold); }
+    .fc-date { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+    .fc-place { font-size: 0.72rem; color: var(--text-dim); margin-bottom: 10px; }
+    .fc-icon { font-size: 2.2rem; margin-bottom: 8px; display: block; line-height: 1; }
+    .fc-desc { font-size: 0.72rem; color: var(--text-dim); margin-bottom: 10px; min-height: 2.5em; }
+    .fc-temp {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.1rem; font-weight: 700; color: var(--text);
+      margin-bottom: 8px;
+    }
+    .fc-temp span { font-size: 0.75rem; color: var(--text-muted); font-weight: 400; }
+    .fc-wind {
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      font-size: 0.75rem; color: var(--text-dim);
+      background: var(--navy-pale); border-radius: 6px; padding: 5px 8px;
+      margin-bottom: 6px;
+    }
+    .fc-wind strong { color: var(--navy-light); font-family: 'DM Mono', monospace; }
+    .fc-wind-dir { font-size: 0.65rem; color: var(--text-muted); }
+    .fc-arrow { display: inline-block; font-size: 0.9rem; }
+    .fc-rain { font-size: 0.68rem; color: var(--text-muted); }
+    .fc-loading { color: var(--text-muted); font-size: 0.78rem; font-style: italic; padding: 20px 0; }
+    .fc-na {
+      font-size: 0.72rem; color: var(--text-muted); font-style: italic;
+      padding: 8px 0; border-top: 1px solid var(--border); margin-top: 8px;
+    }
+
+    /* Typical conditions */
+    .typical-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px; margin-bottom: 24px;
+    }
+    .typ-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px 18px; box-shadow: var(--shadow);
+    }
+    .typ-label { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+    .typ-row { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; border-bottom: 1px solid rgba(30,58,95,0.2); font-size: 0.79rem; }
+    .typ-row:last-child { border-bottom: none; }
+    .typ-key { color: var(--text-dim); }
+    .typ-val { font-weight: 700; color: var(--text); font-family: 'DM Mono', monospace; font-size: 0.76rem; }
+    .typ-val.good { color: var(--green); }
+    .typ-val.warn { color: #fb923c; }
+
+    /* Sailing tips */
+    .tip-list { list-style: none; }
+    .tip-list li {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      font-size: 0.82rem; color: var(--text-dim); line-height: 1.5;
+    }
+    .tip-list li:last-child { border-bottom: none; }
+    .tip-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .tip-list li strong { color: var(--text); }
+
+    .forecast-note {
+      background: rgba(26,79,138,0.07); border: 1px solid rgba(26,79,138,0.15);
+      border-radius: 8px; padding: 12px 16px; font-size: 0.78rem;
+      color: var(--text-dim); margin-bottom: 20px; line-height: 1.55;
+    }
+    .forecast-note strong { color: var(--navy-light); }
+
+    @media (max-width: 600px) {
+      .wind-map-wrap iframe { height: 360px; }
+      .forecast-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="/" class="nav-brand">⛵ Grecian <span>Gusts</span></a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/itinerary">Itinerary</a>
+    <a href="/sailing">Sailing Days</a>
+    <a href="/crew">Crew</a>
+    <a href="/training">Training</a>
+    <a href="/flights">Flights</a>
+    <a href="/packing">Packing</a>
+    <a href="/money">Money</a>
+    <a href="/weather" class="active">Weather</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-eyebrow">Ionian Sea · June 2026</div>
+  <h1>Wind & <em>Weather</em></h1>
+  <p>Live wind map + daily forecasts for every leg of the trip. Know before you go.</p>
+</div>
+
+<div class="section">
+
+  <!-- LIVE WIND MAP -->
+  <div class="section-label">Live Conditions</div>
+  <h2 style="margin-bottom:16px;">Ionian Sea Wind Map</h2>
+  <p class="section-desc" style="margin-bottom:16px;">Live ECMWF model. Use the timeline scrubber to step forward through the forecast. Switch overlays (wind / waves / temp) in the bottom-left menu.</p>
+
+  <div class="wind-map-wrap">
+    <div class="wind-map-label">🌬️ Ionian Sea · Wind · Knots</div>
+    <iframe
+      src="https://embed.windy.com/embed2.html?lat=39.5&lon=20.2&detailLat=39.5&detailLon=20.2&zoom=8&level=surface&overlay=wind&product=ecmwf&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=true&metricWind=kt&metricTemp=%C2%B0F&radarRange=-1"
+      allowfullscreen
+      loading="lazy">
+    </iframe>
+  </div>
+
+  <!-- FORECAST TABS -->
+  <div class="section-label">Trip Forecasts</div>
+  <h2 style="margin-bottom:12px;">Day-by-Day</h2>
+
+  <div class="forecast-note">
+    <strong>Live data:</strong> Forecasts below load automatically from Open-Meteo (ECMWF model). Reliable 10-day forecasts become available ~10 days before each date — until then, typical June conditions are shown.
+  </div>
+
+  <div class="wx-tabs">
+    <div class="wx-tab active" onclick="switchTab('athens')">🏛 Athens</div>
+    <div class="wx-tab" onclick="switchTab('ionian')">⛵ Ionian Sailing</div>
+    <div class="wx-tab" onclick="switchTab('bologna')">🍝 Bologna</div>
+    <div class="wx-tab" onclick="switchTab('milan')">🏙 Milan</div>
+  </div>
+
+  <!-- ATHENS -->
+  <div class="wx-panel active" id="panel-athens">
+    <div class="forecast-grid" id="fc-athens"></div>
+    <div class="section-label" style="margin-top:8px;">Typical June Conditions</div>
+    <div class="typical-grid">
+      <div class="typ-card">
+        <div class="typ-label">Temperature</div>
+        <div class="typ-row"><span class="typ-key">Average high</span><span class="typ-val">88°F / 31°C</span></div>
+        <div class="typ-row"><span class="typ-key">Average low</span><span class="typ-val">68°F / 20°C</span></div>
+        <div class="typ-row"><span class="typ-key">Feels like</span><span class="typ-val warn">Hot + humid</span></div>
+      </div>
+      <div class="typ-card">
+        <div class="typ-label">Wind</div>
+        <div class="typ-row"><span class="typ-key">Prevailing</span><span class="typ-val">NNE (Etesian)</span></div>
+        <div class="typ-row"><span class="typ-key">Typical speed</span><span class="typ-val">10–18 kt</span></div>
+        <div class="typ-row"><span class="typ-key">Gusts</span><span class="typ-val warn">Up to 25 kt</span></div>
+      </div>
+      <div class="typ-card">
+        <div class="typ-label">Sky & Rain</div>
+        <div class="typ-row"><span class="typ-key">Sunshine</span><span class="typ-val good">~14 hrs/day</span></div>
+        <div class="typ-row"><span class="typ-key">Rain days</span><span class="typ-val good">~2 in June</span></div>
+        <div class="typ-row"><span class="typ-key">UV index</span><span class="typ-val warn">Very High (8–10)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IONIAN -->
+  <div class="wx-panel" id="panel-ionian">
+    <div class="forecast-grid" id="fc-ionian"></div>
+    <div class="section-label" style="margin-top:8px;">Typical June Sailing Conditions</div>
+    <div class="typical-grid">
+      <div class="typ-card">
+        <div class="typ-label">Temperature</div>
+        <div class="typ-row"><span class="typ-key">Air high</span><span class="typ-val">85°F / 29°C</span></div>
+        <div class="typ-row"><span class="typ-key">Sea temp</span><span class="typ-val good">74°F / 23°C</span></div>
+        <div class="typ-row"><span class="typ-key">Overnight</span><span class="typ-val">66°F / 19°C</span></div>
+      </div>
+      <div class="typ-card">
+        <div class="typ-label">Wind (Ionian June)</div>
+        <div class="typ-row"><span class="typ-key">Maestro (NW)</span><span class="typ-val good">Typical AM</span></div>
+        <div class="typ-row"><span class="typ-key">Meltemi (N/NE)</span><span class="typ-val warn">Can build PM</span></div>
+        <div class="typ-row"><span class="typ-key">Typical range</span><span class="typ-val">8–20 kt</span></div>
+        <div class="typ-row"><span class="typ-key">Strong days</span><span class="typ-val warn">Up to F5 (22 kt)</span></div>
+      </div>
+      <div class="typ-card">
+        <div class="typ-label">Sea State</div>
+        <div class="typ-row"><span class="typ-key">Swell</span><span class="typ-val good">0.5–1.0 m typical</span></div>
+        <div class="typ-row"><span class="typ-key">Rain days</span><span class="typ-val good">~1–2 in June</span></div>
+        <div class="typ-row"><span class="typ-key">Best sailing</span><span class="typ-val good">Morning departures</span></div>
+      </div>
+      <div class="typ-card">
+        <div class="typ-label">Beaufort Scale Reference</div>
+        <div class="typ-row"><span class="typ-key">F1–F2</span><span class="typ-val good">1–10 kt · Light</span></div>
+        <div class="typ-row"><span class="typ-key">F3–F4</span><span class="typ-val good">11–20 kt · Good sailing</span></div>
+        <div class="typ-row"><span class="typ-key">F5</span><span class="typ-val warn">21–27 kt · Fresh</span></div>
+        <div class="typ-row"><span class="typ-key">F6+</span><span class="typ-val" style="color:#ef4444">28+ kt · Captain decides</span></div>
+      </div>
+    </div>
+
+    <div class="alert info" style="margin-top:8px;">
+      <div class="alert-icon">⚓</div>
+      <div class="alert-text"><strong>Captain Dustin has final say on all routing.</strong> If wind or weather makes a planned stop unsafe or unreasonable, the route changes. No arguments. The Meltemi can build quickly in the afternoon — morning departures are almost always better.</div>
+    </div>
+  </div>
+
+  <!-- BOLOGNA -->
+  <div class="wx-panel" id="panel-bologna">
+    <div class="forecast-grid" id="fc-bologna"></div>
+    <div class="section-label" style="margin-top:8px;">Typical June Conditions</div>
+    <div class="typical-grid">
+      <div class="typ-card">
+        <div class="typ-label">Temperature</div>
+        <div class="typ-row"><span class="typ-key">Average high</span><span class="typ-val">82°F / 28°C</span></div>
+        <div class="typ-row"><span class="typ-key">Average low</span><span class="typ-val">62°F / 17°C</span></div>
+        <div class="typ-row"><span class="typ-key">Humidity</span><span class="typ-val warn">High (Po Valley)</span></div>
+      </div>
+      <div class="typ-card">
+        <div class="typ-label">Sky & Rain</div>
+        <div class="typ-row"><span class="typ-key">Rain days</span><span class="typ-val warn">~8 in June</span></div>
+        <div class="typ-row"><span class="typ-key">Thunderstorms</span><span class="typ-val warn">Possible PM</span></div>
+        <div class="typ-row"><span class="typ-key">Sunshine</span><span class="typ-val">~8 hrs/day</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MILAN -->
+  <div class="wx-panel" id="panel-milan">
+    <div class="forecast-grid" id="fc-milan"></div>
+    <div class="section-label" style="margin-top:8px;">Typical June Conditions</div>
+    <div class="typical-grid">
+      <div class="typ-card">
+        <div class="typ-label">Temperature</div>
+        <div class="typ-row"><span class="typ-key">Average high</span><span class="typ-val">80°F / 27°C</span></div>
+        <div class="typ-row"><span class="typ-key">Average low</span><span class="typ-val">61°F / 16°C</span></div>
+      </div>
+      <div class="typ-card">
+        <div class="typ-label">Sky & Rain</div>
+        <div class="typ-row"><span class="typ-key">Rain days</span><span class="typ-val warn">~9 in June</span></div>
+        <div class="typ-row"><span class="typ-key">Thunderstorms</span><span class="typ-val warn">Common PM</span></div>
+        <div class="typ-row"><span class="typ-key">Sunshine</span><span class="typ-val">~8 hrs/day</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAILING TIPS -->
+  <hr class="section-sep" style="margin: 36px 0;" />
+  <div class="section-label">For the Crew</div>
+  <h2 style="margin-bottom:16px;">Ionian Wind & Weather Tips</h2>
+
+  <div class="alert" style="margin-bottom:20px;">
+    <div class="alert-icon">🌬️</div>
+    <div class="alert-text"><strong>The Meltemi is the thing to know.</strong> This NE/N summer wind dominates the Greek islands Jun–Sep. It usually builds from midday and peaks late afternoon. Morning departures are calmer — this is why the captain will want early starts.</div>
+  </div>
+
+  <div class="alert info" style="margin-bottom:20px;">
+    <div class="alert-icon">💡</div>
+    <div class="alert-text">The Ionian is considered one of the more sheltered sailing areas in Greece — the islands buffer Atlantic swells. The Aegean to the east gets much stronger Meltemi. You picked a good spot.</div>
+  </div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 28px;box-shadow:var(--shadow);">
+    <ul class="tip-list">
+      <li><span class="tip-icon">⏰</span><span><strong>Depart before 9 AM when possible.</strong> Wind is lighter in the morning. By 2–3 PM the Meltemi is often cooking.</span></li>
+      <li><span class="tip-icon">🌡️</span><span><strong>Bring more sun protection than you think.</strong> At sea, UV hits from above AND reflects off the water. June in the Ionian is relentless. Reapply constantly.</span></li>
+      <li><span class="tip-icon">🌊</span><span><strong>Don't assume a calm anchorage is always calm.</strong> Afternoon swell wraps around headlands. Ask the captain before swimming off the stern at anchor.</span></li>
+      <li><span class="tip-icon">🧊</span><span><strong>Stay hydrated.</strong> You won't feel how much you're sweating in the sea breeze. Drink water constantly. The ouzo doesn't count.</span></li>
+      <li><span class="tip-icon">📱</span><span><strong>Windy.com is your friend.</strong> Bookmark it. The ECMWF model (the one above) is considered the most accurate for the Mediterranean. Check it every morning.</span></li>
+      <li><span class="tip-icon">🌩️</span><span><strong>Thunderstorms are rare in the Ionian in June</strong> but not impossible. If you see large buildups over the mountains in the late afternoon, tell the captain.</span></li>
+    </ul>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <div>⛵ <strong>Grecian Gusts</strong> · June 2026</div>
+  <div style="margin-top:6px;"><a href="/">← Home</a> · <a href="/sailing">Sailing Days →</a></div>
+</footer>
+
+<script>
+  // ── TAB SWITCHING ──
+  function switchTab(name) {
+    document.querySelectorAll('.wx-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.wx-panel').forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+
+  // ── WEATHER CODES → ICON + DESC ──
+  function wxIcon(code) {
+    if (code === 0)           return { icon: '☀️', desc: 'Clear sky' };
+    if (code === 1)           return { icon: '🌤️', desc: 'Mainly clear' };
+    if (code === 2)           return { icon: '⛅', desc: 'Partly cloudy' };
+    if (code === 3)           return { icon: '☁️', desc: 'Overcast' };
+    if ([45,48].includes(code)) return { icon: '🌫️', desc: 'Foggy' };
+    if ([51,53,55].includes(code)) return { icon: '🌦️', desc: 'Drizzle' };
+    if ([61,63,65].includes(code)) return { icon: '🌧️', desc: 'Rain' };
+    if ([80,81,82].includes(code)) return { icon: '🌦️', desc: 'Showers' };
+    if ([95,96,99].includes(code)) return { icon: '⛈️', desc: 'Thunderstorm' };
+    return { icon: '🌡️', desc: 'Mixed' };
+  }
+
+  // ── WIND DIRECTION → COMPASS + ARROW ──
+  function windDir(deg) {
+    if (deg === null || deg === undefined) return { compass: '—', arrow: '' };
+    const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+    const idx = Math.round(deg / 22.5) % 16;
+    // Arrow points direction wind is going (rotate arrow)
+    return { compass: dirs[idx], arrow: deg };
+  }
+
+  // ── RENDER FORECAST CARDS ──
+  function renderForecast(containerId, dates, places, data) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    if (!data || !data.daily) {
+      el.innerHTML = '<p class="fc-loading">Could not load forecast data.</p>';
+      return;
+    }
+
+    const { time, temperature_2m_max, temperature_2m_min, weathercode,
+            windspeed_10m_max, winddirection_10m_dominant, precipitation_sum } = data.daily;
+
+    el.innerHTML = dates.map((date, i) => {
+      const idx = time ? time.indexOf(date) : -1;
+      const place = places[i] || places[0];
+      const label = new Date(date + 'T12:00:00Z').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
+
+      if (idx === -1) {
+        return `<div class="fc-card ${containerId.includes('ionian') ? 'sailing' : 'land'}">
+          <div class="fc-date">${label}</div>
+          <div class="fc-place">${place}</div>
+          <div class="fc-icon">📅</div>
+          <div class="fc-desc">June ${parseInt(date.slice(8))} conditions</div>
+          <div class="fc-na">Forecast available ~10 days out</div>
+        </div>`;
+      }
+
+      const wx = wxIcon(weathercode[idx]);
+      const hi = Math.round(temperature_2m_max[idx]);
+      const lo = Math.round(temperature_2m_min[idx]);
+      const wind = Math.round(windspeed_10m_max[idx]);
+      const dir = windDir(winddirection_10m_dominant[idx]);
+      const rain = precipitation_sum[idx] || 0;
+
+      return `<div class="fc-card ${containerId.includes('ionian') ? 'sailing' : 'land'}">
+        <div class="fc-date">${label}</div>
+        <div class="fc-place">${place}</div>
+        <div class="fc-icon">${wx.icon}</div>
+        <div class="fc-desc">${wx.desc}</div>
+        <div class="fc-temp">${hi}° <span>/ ${lo}°F</span></div>
+        <div class="fc-wind">
+          <span style="display:inline-block;transform:rotate(${dir.arrow}deg);font-size:0.9rem;">↑</span>
+          <strong>${wind} kt</strong>
+          <span>${dir.compass}</span>
+        </div>
+        ${rain > 0.1 ? `<div class="fc-rain">🌧 ${rain.toFixed(1)} mm</div>` : '<div class="fc-rain">No rain expected</div>'}
+      </div>`;
+    }).join('');
+  }
+
+  // ── FETCH FORECASTS ──
+  async function loadForecast(containerId, lat, lon, dates, places, tz) {
+    const start = dates[0];
+    const end = dates[dates.length - 1];
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
+      + `&daily=temperature_2m_max,temperature_2m_min,weathercode,windspeed_10m_max,winddirection_10m_dominant,precipitation_sum`
+      + `&temperature_unit=fahrenheit&wind_speed_unit=kn&timezone=${tz}`
+      + `&start_date=${start}&end_date=${end}`;
+
+    // Pre-render with placeholder cards
+    const el = document.getElementById(containerId);
+    if (el) el.innerHTML = `<div style="grid-column:1/-1;" class="fc-loading">Loading forecast…</div>`;
+
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      renderForecast(containerId, dates, places, data);
+    } catch(e) {
+      renderForecast(containerId, dates, places, null);
+    }
+  }
+
+  // ── DATE RANGES ──
+  const ATHENS_DATES  = ['2026-06-11','2026-06-12','2026-06-13'];
+  const IONIAN_DATES  = ['2026-06-13','2026-06-14','2026-06-15','2026-06-16','2026-06-17','2026-06-18','2026-06-19','2026-06-20'];
+  const BOLOGNA_DATES = ['2026-06-20','2026-06-21','2026-06-22'];
+  const MILAN_DATES   = ['2026-06-22','2026-06-23'];
+
+  const IONIAN_PLACES = ['Gouvia, Corfu','Mandraki, Corfu','Lakka, Paxos','Antipaxos','Parga','Sivota','Plataria Marina','Corfu → Bologna'];
+
+  loadForecast('fc-athens',  37.9838, 23.7275, ATHENS_DATES,  ['Athens'],          'Europe%2FAthens');
+  loadForecast('fc-ionian',  39.6200, 19.9200, IONIAN_DATES,  IONIAN_PLACES,       'Europe%2FAthens');
+  loadForecast('fc-bologna', 44.4949, 11.3426, BOLOGNA_DATES, ['Bologna'],         'Europe%2FRome');
+  loadForecast('fc-milan',   45.4654,  9.1859, MILAN_DATES,   ['Milan'],           'Europe%2FRome');
+</script>
+
+<!-- Cloudflare Web Analytics --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a0fcb96500f347239330201e7253c4f4"}'></script><!-- End Cloudflare Web Analytics -->
+</body>
+</html>
