@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="/auth.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Corfu Road Trip · Jun 13 · Grecian Gusts 2026</title>
+  <link rel="stylesheet" href="/shared.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+
+    /* ── BACK BAR ── */
+    .back-bar {
+      background: var(--navy);
+      padding: 0 20px; height: 48px;
+      display: flex; align-items: center;
+      box-shadow: 0 2px 12px rgba(26,79,138,0.2);
+      position: sticky; top: 0; z-index: 200;
+    }
+    .back-bar a {
+      color: rgba(255,255,255,0.8); text-decoration: none;
+      font-size: 0.78rem; font-weight: 700;
+      display: flex; align-items: center; gap: 8px;
+      letter-spacing: 0.03em;
+      transition: color 0.15s;
+    }
+    .back-bar a:hover { color: var(--gold-light); }
+    .back-bar .back-icon { font-size: 1rem; }
+    .back-bar .trip-label {
+      margin-left: auto;
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--gold-light);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(160deg, var(--navy) 0%, #1a6090 50%, #1e8fa0 100%);
+      padding: 44px 20px 52px;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='30' cy='30' r='1.5' fill='rgba(255,255,255,0.06)'/%3E%3C/svg%3E");
+    }
+    .hero::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 48px;
+      background: var(--bg);
+      clip-path: ellipse(55% 100% at 50% 100%);
+    }
+    .hero-eyebrow {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: rgba(255,255,255,0.6);
+      margin-bottom: 10px; position: relative;
+    }
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 700; font-style: italic;
+      color: white; line-height: 1.1; margin-bottom: 10px;
+      position: relative;
+    }
+    .hero h1 em { font-style: normal; color: var(--gold-light); }
+    .hero-meta {
+      display: flex; align-items: center; justify-content: center;
+      gap: 16px; flex-wrap: wrap;
+      font-size: 0.8rem; color: rgba(255,255,255,0.7);
+      position: relative; margin-top: 4px;
+    }
+    .hero-meta span { display: flex; align-items: center; gap: 5px; }
+
+    /* ── MAP ── */
+    #map {
+      width: 100%; height: 420px;
+      border-top: 3px solid var(--gold);
+      border-bottom: 3px solid var(--gold);
+      position: relative; z-index: 1;
+    }
+    @media (max-width: 600px) { #map { height: 320px; } }
+
+    /* custom leaflet marker numbers */
+    .stop-marker {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--navy); border: 2.5px solid white;
+      color: white; font-size: 0.75rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+      font-family: 'Karla', sans-serif;
+      cursor: pointer;
+    }
+    .stop-marker.food   { background: var(--gold); }
+    .stop-marker.marina { background: var(--green); }
+    .stop-marker.start  { background: #555; }
+
+    /* ── CONTENT WRAPPER ── */
+    .content { max-width: 720px; margin: 0 auto; padding: 0 16px 60px; }
+
+    /* ── LOGISTICS BAR ── */
+    .logistics-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px; margin: 28px 0 32px;
+    }
+    .logistic-chip {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 14px;
+      box-shadow: var(--shadow);
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .logistic-chip .lc-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+    .logistic-chip .lc-label {
+      font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 2px;
+    }
+    .logistic-chip .lc-val { font-size: 0.8rem; font-weight: 700; color: var(--text); }
+    .logistic-chip .lc-sub { font-size: 0.72rem; color: var(--text-dim); margin-top: 1px; }
+    .logistic-chip.warn { border-color: rgba(176,48,48,0.3); background: var(--red-pale); }
+    .logistic-chip.warn .lc-val { color: var(--red); }
+
+    /* ── STOPS ── */
+    .stops-header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 20px;
+    }
+    .stops-header h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 700; font-style: italic;
+      color: var(--text);
+    }
+    .stop-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+      transition: box-shadow 0.2s;
+    }
+    .stop-card:hover { box-shadow: var(--shadow-md); }
+    .stop-card.stop-food   { border-left: 4px solid var(--gold); }
+    .stop-card.stop-sight  { border-left: 4px solid var(--navy); }
+    .stop-card.stop-beach  { border-left: 4px solid var(--sky); }
+    .stop-card.stop-marina { border-left: 4px solid var(--green); }
+    .stop-card.stop-start  { border-left: 4px solid #999; }
+
+    .stop-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .stop-num {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      background: var(--navy); color: white;
+      font-size: 0.75rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .stop-card.stop-food   .stop-num { background: var(--gold); }
+    .stop-card.stop-beach  .stop-num { background: var(--sky); }
+    .stop-card.stop-marina .stop-num { background: var(--green); }
+    .stop-card.stop-start  .stop-num { background: #888; }
+
+    .stop-header-text { flex: 1; min-width: 0; }
+    .stop-time {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+    .stop-name {
+      font-size: 0.95rem; font-weight: 700; color: var(--text);
+      line-height: 1.25;
+    }
+    .stop-tag {
+      font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--text-muted);
+      margin-top: 1px;
+    }
+    .stop-chevron {
+      font-size: 0.8rem; color: var(--text-muted);
+      transition: transform 0.2s; flex-shrink: 0;
+    }
+    .stop-card.open .stop-chevron { transform: rotate(180deg); }
+
+    .stop-body {
+      padding: 0 16px; max-height: 0; overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.2s;
+    }
+    .stop-card.open .stop-body {
+      max-height: 600px;
+      padding: 0 16px 16px;
+    }
+
+    .stop-desc {
+      font-size: 0.82rem; color: var(--text-dim);
+      line-height: 1.6; margin-bottom: 12px;
+      padding-top: 2px;
+    }
+    .stop-desc strong { color: var(--text); }
+
+    .stop-actions {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 16px; border-radius: 8px;
+      font-size: 0.78rem; font-weight: 700;
+      text-decoration: none; transition: all 0.15s;
+      border: none; cursor: pointer;
+    }
+    .btn-maps {
+      background: #1a73e8; color: white;
+    }
+    .btn-maps:hover { background: #1558b0; }
+    .btn-maps-directions {
+      background: #34a853; color: white;
+    }
+    .btn-maps-directions:hover { background: #1e7e34; }
+    .btn-outline {
+      background: transparent; color: var(--navy);
+      border: 1.5px solid rgba(26,79,138,0.3);
+    }
+    .btn-outline:hover { background: var(--navy-pale); }
+
+    /* eats section */
+    .stop-eats {
+      background: var(--gold-pale);
+      border: 1px solid rgba(212,134,10,0.2);
+      border-radius: 8px; padding: 10px 12px;
+      margin-top: 4px;
+    }
+    .stop-eats-label {
+      font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: #7a4800; margin-bottom: 6px;
+    }
+    .stop-eats-item {
+      font-size: 0.79rem; color: #5a3600; line-height: 1.5;
+      display: flex; gap: 8px; align-items: flex-start;
+      margin-bottom: 3px;
+    }
+    .stop-eats-item:last-child { margin-bottom: 0; }
+    .stop-eats-item .eat-icon { flex-shrink: 0; }
+
+    /* drive connector */
+    .drive-connector {
+      display: flex; align-items: center; gap: 10px;
+      padding: 5px 0 5px 29px;
+      color: var(--text-muted); font-size: 0.75rem;
+    }
+    .drive-line {
+      width: 2px; height: 18px; background: var(--border);
+      flex-shrink: 0; margin-left: -1px;
+    }
+
+    /* ── TIPS BOX ── */
+    .tips-box {
+      background: var(--navy-pale); border: 1px solid rgba(26,79,138,0.2);
+      border-radius: 12px; padding: 18px 20px; margin-top: 28px;
+    }
+    .tips-box h3 {
+      font-size: 0.85rem; font-weight: 700; color: var(--navy);
+      margin-bottom: 10px;
+    }
+    .tips-box ul {
+      list-style: none; padding: 0;
+    }
+    .tips-box li {
+      font-size: 0.8rem; color: var(--navy-mid);
+      padding: 4px 0; display: flex; gap: 8px; line-height: 1.5;
+    }
+    .tips-box li::before { content: '→'; flex-shrink: 0; color: var(--sky); }
+
+  </style>
+</head>
+<body>
+
+  <!-- ── BACK BAR ── -->
+  <div class="back-bar">
+    <a href="/itinerary/">
+      <span class="back-icon">←</span>
+      Back to Itinerary
+    </a>
+    <span class="trip-label">Jun 13 · Grecian Gusts</span>
+  </div>
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-eyebrow">Saturday, June 13, 2026 · Corfu, Greece</div>
+    <h1>Corfu <em>Road Trip</em></h1>
+    <div class="hero-meta">
+      <span>🚐 9-seat van</span>
+      <span>⏱ 8 AM – 6 PM</span>
+      <span>📍 ~120 km loop</span>
+      <span>🏁 Northwest Circuit</span>
+    </div>
+  </div>
+
+  <!-- ── MAP ── -->
+  <div id="map"></div>
+
+  <!-- ── CONTENT ── -->
+  <div class="content">
+
+    <!-- logistics -->
+    <div class="logistics-row">
+      <div class="logistic-chip">
+        <span class="lc-icon">🚐</span>
+        <div>
+          <div class="lc-label">Vehicle</div>
+          <div class="lc-val">Fiat Talento (9-seat)</div>
+          <div class="lc-sub">Dirent a Car · Conf 5VU230</div>
+        </div>
+      </div>
+      <div class="logistic-chip">
+        <span class="lc-icon">⏰</span>
+        <div>
+          <div class="lc-label">Pick-up</div>
+          <div class="lc-val">8:00 AM · CFU Airport</div>
+          <div class="lc-sub">Meet &amp; greet at arrivals · free shuttle</div>
+        </div>
+      </div>
+      <div class="logistic-chip warn">
+        <span class="lc-icon">⚠️</span>
+        <div>
+          <div class="lc-label">Return</div>
+          <div class="lc-val">Jun 14 by 8:00 AM</div>
+          <div class="lc-sub">Return to Gouvia area · call for shuttle</div>
+        </div>
+      </div>
+      <div class="logistic-chip warn">
+        <span class="lc-icon">💳</span>
+        <div>
+          <div class="lc-label">Deposit</div>
+          <div class="lc-val">1,500 EUR hold</div>
+          <div class="lc-sub">Credit card in driver's name required</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- stops -->
+    <div class="stops-header">
+      <h2>The Route — 9 Stops</h2>
+    </div>
+
+    <!-- STOP 0: Airport pickup -->
+    <div class="stop-card stop-start open" data-stop="0">
+      <div class="stop-header" onclick="toggleStop(this)">
+        <div class="stop-num">S</div>
+        <div class="stop-header-text">
+          <div class="stop-time">8:00 AM</div>
+          <div class="stop-name">Car Rental Pick-up · Corfu Airport</div>
+          <div class="stop-tag">Start · CFU</div>
+        </div>
+        <span class="stop-chevron">▼</span>
+      </div>
+      <div class="stop-body">
+        <p class="stop-desc">Meet &amp; greet at arrivals — Dirent a Car will be holding a sign with your name. Free shuttle to their off-airport office. Allow <strong>20–30 min</strong> for paperwork and shuttle before you're on the road.</p>
+        <div class="stop-actions">
+          <a class="btn btn-maps" href="https://maps.google.com/?q=39.6017,19.9117" target="_blank">📍 View on Map</a>
+          <a class="btn btn-outline" href="tel:+302661033250">☎ +30 2661 033 250</a>
+        </div>
+      </div>
+    </div>
+    <div class="drive-connector">
+      <div class="drive-line"></div>
+      🚐 Drive west ~40 min (25 km) · scenic mountain road through the interior
+    </div>
+
+    <!-- STOP 1: Paleokastritsa -->
+    <div class="stop-card stop-beach" data-stop="1">
+      <div class="stop-header" onclick="toggleStop(this)">
+        <div class="stop-num">1</div>
+        <div class="stop-header-text">
+          <div class="stop-time">9:00 – 10:15 AM</div>
+          <div class="stop-name">Paleokastritsa</div>
+          <div class="stop-tag">Beach · Monastery · Best swim stop</div>
+        </div>
+        <span class="stop-chevron">▼</span>
+      </div>
+      <div class="stop-body">
+        <p class="stop-desc">Six turquoise bays carved into dramatic cliffs — widely considered the most beautiful spot on Corfu. <strong>Get here early</strong> (you will, at 9 AM) before tour buses arrive. The water is absurdly clear. The 13th-century monastery perched above the main bay takes 10 min to walk up and is worth it for the views alone.</p>
+        <div class="stop-actions">
+          <a class="btn btn-maps-directions" href="https://www.google.com/maps/dir/?api=1&destination=39.6694,19.6828&travelmode=driving" target="_blank">🧭 Navigate Here</a>
+          <a class="btn btn-maps" href="https://maps.google.com/?q=39.6694,19.6828" target="_blank">📍 View on Map</a>
+        </div>
+        <div class="stop-eats">
+          <div class="stop-eats-label">☕ Fuel Up Nearby</div>
+          <div class="stop-eats-item"><span class="eat-icon">🐙</span><strong>Taverna Astakos</strong> — right on the water, lobster and grilled octopus. Opens ~10 AM. Good for a late breakfast bite.</div>
+          <div class="stop-eats-item"><span class="eat-icon">☕</span><strong>Vrachos Café</strong> — clifftop perch above the bays, cold frappé with a view. Perfect pre-drive coffee stop.</div>
+        </div>
+      </div>
+    </div>
+    <div class="drive-connector">
+      <div class="drive-line"></div>
+      🚐 Drive up ~10 min (3 km) · winding hillside road to Lakones
+    </div>
+
+    <!-- STOP 2: Bella Vista / Lakones -->
+    <div class="stop-card stop-sight" data-stop="2">
+      <div class="stop-header" onclick="toggleStop(this)">
+        <div class="stop-num">2</div>
+        <div class="stop-header-text">
+          <div class="stop-time">10:25 AM</div>
+          <div class="stop-name">Bella Vista Viewpoint · Lakones</div>
+          <div class="stop-tag">Viewpoint · 15 min stop</div>
+        </div>
+        <span class="stop-chevron">▼</span>
+      </div>
+      <div class="stop-body">
+        <p class="stop-desc">The hilltop village of Lakones sits directly above Paleokastritsa and offers a jaw-dropping panorama of all six bays from above. <strong>Best photo of the trip.</strong> Takes 15 min — pull over, take the shots, keep moving.</p>
+        <div class="stop-actions">
+          <a class="btn btn-maps-directions" href="https://www.google.com/maps/dir/?api=1&destination=39.6811,19.7028&travelmode=driving" target="_blank">🧭 Navigate Here</a>
+          <a class="btn btn-maps" href="https://maps.google.com/?q=39.6811,19.7028" target="_blank">📍 View on Map</a>
+        </div>
+      </div>
+    </div>
+    <div class="drive-connector">
+      <div class="drive-line"></div>
+      🚐 Drive north ~20 min (13 km) along the coastal clifftop road
+    </div>
+
+    <!-- STOP 3: Angelokastro -->
+    <div class="stop-card stop-sight" data-stop="3">
+      <div class="stop-header" onclick="toggleStop(this)">
+        <div class="stop-num">3</div>
+        <div class="stop-header-text">
+          <div class="stop-time">10:50 – 11:45 AM</div>
+          <div class="stop-name">Angelokastro Castle</div>
+          <div class="stop-tag">Byzantine Castle · Best views on the island</div>
+        </div>
+        <span class="stop-chevron">▼</span>
+      </div>
+      <div class="stop-body">
+        <p class="stop-desc">A 13th-century Byzantine fortress perched on a sheer sea cliff — one of the most dramatic historical sites in the Ionian. Never fell to Ottoman siege. The climb to the top is short (10 min) but steep; the views over the northwest coast are stunning in both directions. Entry ~€4. Allow 45 min.</p>
+        <div class="stop-actions">
+          <a class="btn btn-maps-directions" href="https://www.google.com/maps/dir/?api=1&destination=39.7175,19.6672&travelmode=driving" target="_blank">🧭 Navigate Here</a>
+          <a class="btn btn-maps" href="https://maps.google.com/?q=39.7175,19.6672" target="_blank">📍 View on Map</a>
+        </div>
+      </div>
+    </div>
+    <div class="drive-connector">
+      <div class="drive-line"></div>
+      🚐 Drive north ~35 min (22 km) · inland through Troumbetas Pass
+    </div>
+
+    <!-- STOP 4: Sidari / Canal d'Amour -->
+    <div class="stop-card stop-beach" data-stop="4">
+      <div class="stop-header" onclick="toggleStop(this)">
+        <div class="stop-num">4</div>
+        <div class="stop-header-text">
+          <div class="stop-time">12:20 PM</div>
+          <div class="stop-name">Sidari · Canal d'Amour</div>
+          <div class="stop-tag">Beach · Rock formations · Legend</div>
+        </div>
+        <span class="stop-chevron">▼</span>
+      </div>
+      <div class="stop-body">
+        <p class="stop-desc">The <em>Canal d'Amour</em> ("Channel of Love") is a narrow sea channel carved through sculpted sandstone cliffs. Legend: <strong>anyone who swims through it will find eternal love.</strong> The formations are legitimately otherworldly — golden rock walls rising out of clear water. Sidari itself is a busy resort town; park at the canal and skip the main strip.</p>
+        <div class="stop-actions">
+          <a class="btn btn-maps-directions" href="https://www.google.com/maps/dir/?api=1&destination=39.7811,19.7133&travelmode=driving" target="_blank">🧭 Navigate Here</a>
+          <a class="btn btn-maps" href="https://maps.google.com/?q=39.7811,19.7133" target="_blank">📍 View on Map</a>
+        </div>
+        <div class="stop-eats">
+          <div class="stop-eats-label">🍽 Quick lunch option</div>
+          <div class="stop-eats-item"><span class="eat-icon">🥗</span><strong>Cavo D'Oro</strong> (Sidari waterfront) — solid Greek plates, quick service, good for a group. Gyros and fresh salads.</div>
+        </div>
+      </div>
+    </div>
+    <div class="drive-connector">
+      <div class="drive-line"></div>
+      🚐 Drive west ~15 min (9 km) · narrow coastal road to the northwest tip
+    </div>
+
+    <!-- STOP 5: Cape Drastis -->
+    <div class="stop-card stop-sight" data-stop="5">
+      <div class="stop-header" onclick="toggleStop(this)">
+        <div class="stop-num">5</div>
+        <div class="stop-header-text">
+          <div class="stop-time">1:00 PM</div>
+          <div class="stop-name">Cape Drastis</div>
+          <div class="stop-tag">⭐ The highlight of Corfu · Northwest tip</div>
+        </div>
+        <span class="stop-chevron">▼</span>
+      </div>
+      <div class="stop-body">
+        <p class="stop-desc"><strong>The single best sight on the island.</strong> Pale limestone formations that have been sculpted by the sea into dramatic headlands, arches, and stacks jutting into deep blue water. Park at the small dirt lot and walk 10 min down to the viewpoint. If conditions allow, there's a small beach at the base — the water color here is unreal. Every "best of Corfu" list puts this at #1.</p>
+        <div class="stop-actions">
+          <a class="btn btn-maps-directions" href="https://www.google.com/maps/dir/?api=1&destination=39.7944,19.6628&travelmode=driving" target="_blank">🧭 Navigate Here</a>
+          <a class="btn btn-maps" href="https://maps.google.com/?q=39.7944,19.6628" target="_blank">📍 View on Map</a>
+        </div>
+      </div>
+    </div>
+    <div class="drive-connector">
+      <div class="drive-line"></div>
+      🚐 Drive east ~10 min (6 km) to Peroulades
+    </div>
+
+    <!-- STOP 6: Loggas / Peroulades — LUNCH -->
+    <div class="stop-card stop-food" data-stop="6">
+      <div class="stop-header" onclick="toggleStop(this)">
+        <div class="stop-num">6</div>
+        <div class="stop-header-text">
+          <div class="stop-time">1:45 – 2:45 PM</div>
+          <div class="stop-name">Loggas Beach · Peroulades</div>
+          <div class="stop-tag">Cliffside lunch · Sunset cliffs · Swim</div>
+        </div>
+        <span class="stop-chevron">▼</span>
+      </div>
+      <div class="stop-body">
+        <p class="stop-desc">Loggas Beach sits at the foot of 50 m golden cliffs and is famous for sunset (which you'll miss — you board at 6 PM). But the cliffs and beach are spectacular at midday too, and the clifftop tavernas are among the best on the island. <strong>Ideal lunch stop.</strong> Walk down the stairs from the village, swim, eat at the clifftop restaurant above.</p>
+        <div class="stop-actions">
+          <a class="btn btn-maps-directions" href="https://www.google.com/maps/dir/?api=1&destination=39.7983,19.7033&travelmode=driving" target="_blank">🧭 Navigate Here</a>
+          <a class="btn btn-maps" href="https://maps.google.com/?q=39.7983,19.7033" target="_blank">📍 View on Map</a>
+        </div>
+        <div class="stop-eats">
+          <div class="stop-eats-label">🍽 Lunch Here</div>
+          <div class="stop-eats-item"><span class="eat-icon">🌅</span><strong>Sunset Restaurant Peroulades</strong> — right on the cliff edge above Loggas. Greek salad, fresh grilled fish, cold Mythos. Reserve or arrive before 1 PM to snag a cliff-edge table. <a href="https://www.google.com/maps/dir/?api=1&destination=39.7990,19.7040&travelmode=driving" target="_blank" style="color:var(--gold);">→ Directions</a></div>
+          <div class="stop-eats-item"><span class="eat-icon">🍺</span><strong>7th Heaven Café</strong> — slightly more casual, right above the stairs down to the beach. Cold drinks, mezze plates, shade.</div>
+        </div>
+      </div>
+    </div>
+    <div class="drive-connector">
+      <div class="drive-line"></div>
+      🚐 Drive east ~50 min (38 km) · cross the island, scenic mountain route or north coast
+    </div>
+
+    <!-- STOP 7: Kassiopi -->
+    <div class="stop-card stop-sight" data-stop="7">
+      <div class="stop-header" onclick="toggleStop(this)">
+        <div class="stop-num">7</div>
+        <div class="stop-header-text">
+          <div class="stop-time">3:30 – 4:30 PM</div>
+          <div class="stop-name">Kassiopi Harbor</div>
+          <div class="stop-tag">Harbor village · Medieval fortress · Optional swim</div>
+        </div>
+        <span class="stop-chevron">▼</span>
+      </div>
+      <div class="stop-body">
+        <p class="stop-desc">A beautiful northeastern harbor village with a medieval Byzantine fortress overlooking the sea. Much less touristy than Corfu Town. The harbor is lined with fishing boats and tavernas, and the short walk up to the fortress ruins gives you views across to Albania. Good place for a coffee or ice cream before the final drive south.</p>
+        <div class="stop-actions">
+          <a class="btn btn-maps-directions" href="https://www.google.com/maps/dir/?api=1&destination=39.7917,19.9217&travelmode=driving" target="_blank">🧭 Navigate Here</a>
+          <a class="btn btn-maps" href="https://maps.google.com/?q=39.7917,19.9217" target="_blank">📍 View on Map</a>
+        </div>
+        <div class="stop-eats">
+          <div class="stop-eats-label">☕ Afternoon stop</div>
+          <div class="stop-eats-item"><span class="eat-icon">🍦</span><strong>Janis Restaurant</strong> — harbourfront, great for gelato or cold drinks. Relaxed vibe, fast service for a group.</div>
+          <div class="stop-eats-item"><span class="eat-icon">🐟</span><strong>The Old School Taverna</strong> — if you skipped lunch at Peroulades, this is your backup. Excellent fresh catch.</div>
+        </div>
+      </div>
+    </div>
+    <div class="drive-connector">
+      <div class="drive-line"></div>
+      🚐 Drive south ~45 min (37 km) · scenic east coast road to Gouvia
+    </div>
+
+    <!-- STOP 8: Gouvia Marina -->
+    <div class="stop-card stop-marina" data-stop="8">
+      <div class="stop-header" onclick="toggleStop(this)">
+        <div class="stop-num">🏁</div>
+        <div class="stop-header-text">
+          <div class="stop-time">5:15 PM</div>
+          <div class="stop-name">Gouvia Marina · Grecian Gusts</div>
+          <div class="stop-tag">Board by 6 PM · Sunsail 454L · Conf USJZNE</div>
+        </div>
+        <span class="stop-chevron">▼</span>
+      </div>
+      <div class="stop-body">
+        <p class="stop-desc">Return to Gouvia Marina — all 7 crew aboard the <strong>Grecian Gusts</strong> (Sunsail 454L). Drop bags, sign T&amp;C, provision the boat, settle in. <strong>Board by 6:00 PM.</strong> The van stays with you overnight and gets returned to Dirent a Car the next morning (Jun 14, 8 AM).</p>
+        <div class="stop-actions">
+          <a class="btn btn-maps-directions" href="https://www.google.com/maps/dir/?api=1&destination=39.6433,19.8650&travelmode=driving" target="_blank">🧭 Navigate to Marina</a>
+          <a class="btn btn-maps" href="https://maps.google.com/?q=39.6433,19.8650" target="_blank">📍 View on Map</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- tips -->
+    <div class="tips-box">
+      <h3>🚐 Road Trip Tips</h3>
+      <ul>
+        <li>Roads in the northwest hills are narrow and steep — the Talento van is big, leave extra time on mountain legs and go slow.</li>
+        <li>Park in the main lot at Paleokastritsa early — it fills up fast by 10 AM in summer.</li>
+        <li>Cape Drastis: small dirt lot, 10 min walk down. Worth it every time. Don't skip it.</li>
+        <li>Fuel policy is <strong>same to same</strong> — fill the tank before returning Jun 14.</li>
+        <li>Credit card deposit hold (1,500 EUR) should clear within 2–3 weeks after return.</li>
+        <li>Corfu roads use Google Maps well — keep it running for the mountain segments.</li>
+        <li>Nearest petrol on the way back: Gouvia town, just before the marina turn-off.</li>
+      </ul>
+    </div>
+
+  </div><!-- end .content -->
+
+  <footer class="site-footer">
+    <strong>Grecian Gusts 2026</strong> · Jun 13 Corfu Road Trip<br>
+    Dirent a Car · Booking <em>D014140117</em> · Conf <em>5VU230</em> · ☎ +30 2661 033 250
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // ── STOPS DATA ──
+    const stops = [
+      { lat: 39.6017, lng: 19.9117, label: 'S',  title: 'Car Rental · CFU Airport',      color: '#888',    type: 'start'  },
+      { lat: 39.6694, lng: 19.6828, label: '1',  title: 'Paleokastritsa',                color: '#4a90d9', type: 'beach'  },
+      { lat: 39.6811, lng: 19.7028, label: '2',  title: 'Bella Vista · Lakones',         color: '#1b4f8a', type: 'sight'  },
+      { lat: 39.7175, lng: 19.6672, label: '3',  title: 'Angelokastro Castle',           color: '#1b4f8a', type: 'sight'  },
+      { lat: 39.7811, lng: 19.7133, label: '4',  title: "Sidari · Canal d'Amour",        color: '#4a90d9', type: 'beach'  },
+      { lat: 39.7944, lng: 19.6628, label: '5',  title: 'Cape Drastis ⭐',               color: '#1b4f8a', type: 'sight'  },
+      { lat: 39.7983, lng: 19.7033, label: '6',  title: 'Loggas Beach · Lunch',          color: '#d4860a', type: 'food'   },
+      { lat: 39.7917, lng: 19.9217, label: '7',  title: 'Kassiopi Harbor',               color: '#1b4f8a', type: 'sight'  },
+      { lat: 39.6433, lng: 19.8650, label: '🏁', title: 'Gouvia Marina · Board 6 PM',    color: '#2e7d4f', type: 'marina' },
+    ];
+
+    // ── INIT MAP ──
+    const map = L.map('map', { zoomControl: true, scrollWheelZoom: false })
+      .setView([39.72, 19.78], 11);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
+      maxZoom: 18
+    }).addTo(map);
+
+    // Route polyline
+    const routeCoords = stops.map(s => [s.lat, s.lng]);
+    L.polyline(routeCoords, {
+      color: '#1b4f8a', weight: 3.5, opacity: 0.7,
+      dashArray: '8, 6'
+    }).addTo(map);
+
+    // Markers
+    stops.forEach((stop, i) => {
+      const icon = L.divIcon({
+        className: '',
+        html: `<div class="stop-marker" style="background:${stop.color};">${stop.label}</div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -18]
+      });
+      const marker = L.marker([stop.lat, stop.lng], { icon }).addTo(map);
+      const gmUrl = `https://www.google.com/maps/dir/?api=1&destination=${stop.lat},${stop.lng}&travelmode=driving`;
+      marker.bindPopup(`
+        <div style="font-family:'Karla',sans-serif;min-width:160px;">
+          <div style="font-size:0.7rem;color:#888;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;">Stop ${stop.label}</div>
+          <div style="font-size:0.9rem;font-weight:700;color:#1a1208;margin-bottom:8px;">${stop.title}</div>
+          <a href="${gmUrl}" target="_blank"
+             style="display:inline-flex;align-items:center;gap:5px;background:#34a853;color:white;padding:6px 12px;border-radius:6px;font-size:0.75rem;font-weight:700;text-decoration:none;">
+            🧭 Navigate Here
+          </a>
+        </div>
+      `, { maxWidth: 220 });
+    });
+
+    // ── ACCORDION ──
+    function toggleStop(header) {
+      const card = header.closest('.stop-card');
+      card.classList.toggle('open');
+    }
+    // Open first card by default
+    document.querySelector('.stop-card').classList.add('open');
+  </script>
+
+</body>
+</html>
