@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="/auth.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caption Log · Grecian Gusts 2026</title>
+  <link rel="stylesheet" href="/shared.css" />
+  <style>
+    .caption-hero-sub {
+      font-size: 0.85rem; color: var(--text-dim);
+      max-width: 520px; margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ── ADD BUTTON ── */
+    .add-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--navy); color: white;
+      padding: 12px 24px; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 700;
+      letter-spacing: 0.04em; border: none;
+      cursor: pointer; box-shadow: var(--shadow-md);
+      transition: background 0.15s, transform 0.1s;
+    }
+    .add-btn:hover { background: var(--navy-dark); }
+    .add-btn:active { transform: scale(0.97); }
+
+    /* ── MODAL OVERLAY ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--bg); border-radius: 16px;
+      padding: 28px 24px 24px;
+      width: min(480px, 100%);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+      animation: modalIn 0.2s ease;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(16px) scale(0.97); }
+      to   { opacity: 1; transform: none; }
+    }
+    .modal-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 700; font-style: italic;
+      color: var(--navy); margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block; font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 6px;
+    }
+    .form-input, .form-textarea, .form-select {
+      width: 100%; padding: 11px 14px;
+      font-family: 'Karla', sans-serif;
+      font-size: 0.9rem; color: var(--text);
+      background: white; border: 1.5px solid var(--border);
+      border-radius: 8px; outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      margin-bottom: 16px;
+    }
+    .form-textarea { min-height: 90px; resize: vertical; }
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(27,79,138,0.1);
+    }
+
+    .modal-actions {
+      display: flex; gap: 10px; justify-content: flex-end;
+      margin-top: 4px;
+    }
+    .btn-cancel {
+      padding: 10px 18px; border-radius: 8px; border: 1.5px solid var(--border);
+      background: transparent; font-family: 'Karla', sans-serif;
+      font-size: 0.82rem; font-weight: 700; color: var(--text-dim);
+      cursor: pointer; transition: border-color 0.15s;
+    }
+    .btn-cancel:hover { border-color: var(--text-muted); }
+    .btn-save {
+      padding: 10px 22px; border-radius: 8px; border: none;
+      background: var(--navy); color: white;
+      font-family: 'Karla', sans-serif;
+      font-size: 0.82rem; font-weight: 700;
+      cursor: pointer; box-shadow: var(--shadow);
+      transition: background 0.15s;
+    }
+    .btn-save:hover { background: var(--navy-dark); }
+
+    /* ── CAPTION FEED ── */
+    .feed-controls {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      align-items: center; margin-bottom: 24px;
+    }
+    .filter-chip {
+      padding: 6px 14px; border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: var(--card); color: var(--text-dim);
+      font-size: 0.73rem; font-weight: 700;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .filter-chip.active, .filter-chip:hover {
+      border-color: var(--navy); color: var(--navy);
+      background: var(--navy-pale);
+    }
+
+    .caption-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+    .caption-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px;
+      display: flex; flex-direction: column; gap: 10px;
+      position: relative;
+      box-shadow: var(--shadow);
+      animation: cardIn 0.25s ease;
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .caption-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem; font-weight: 600; font-style: italic;
+      color: var(--text); line-height: 1.45;
+    }
+
+    .caption-meta {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    }
+    .meta-tag {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 3px 10px;
+      border-radius: 12px; border: 1px solid var(--border);
+    }
+    .tag-location { color: var(--sky); border-color: var(--sky); background: rgba(74,144,217,0.08); }
+    .tag-crew    { color: var(--gold); border-color: var(--gold); background: rgba(212,134,10,0.08); }
+    .tag-date    { color: var(--text-muted); border-color: var(--border); }
+
+    .caption-delete {
+      position: absolute; top: 12px; right: 12px;
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); font-size: 0.8rem;
+      padding: 4px 6px; border-radius: 6px;
+      opacity: 0; transition: opacity 0.15s, background 0.15s;
+    }
+    .caption-card:hover .caption-delete { opacity: 1; }
+    .caption-delete:hover { background: rgba(176,48,48,0.1); color: #b03030; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center; padding: 60px 24px;
+      color: var(--text-dim);
+    }
+    .empty-state-icon { font-size: 3rem; margin-bottom: 16px; }
+    .empty-state-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem; font-style: italic;
+      color: var(--text); margin-bottom: 8px;
+    }
+    .empty-state-sub { font-size: 0.83rem; line-height: 1.6; }
+
+    /* ── EXPORT ── */
+    .export-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--card); color: var(--text-dim);
+      font-size: 0.73rem; font-weight: 700; letter-spacing: 0.04em;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .export-btn:hover { border-color: var(--navy); color: var(--navy); }
+
+    .count-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 22px; height: 22px; border-radius: 11px;
+      background: var(--navy); color: white;
+      font-size: 0.68rem; font-weight: 700;
+      padding: 0 6px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="/" class="nav-brand">⛵ Grecian <span>Gusts</span></a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/itinerary">Itinerary</a>
+    <a href="/sailing">Sailing Days</a>
+    <a href="/crew">Crew</a>
+    <a href="/training">Training</a>
+    <a href="/flights">Flights</a>
+    <a href="/packing">Packing</a>
+    <a href="/money">Money</a>
+    <a href="/weather">Weather</a>
+    <a href="/captions" class="active">Captions</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-eyebrow">Grecian Gusts · June 2026</div>
+  <h1 class="page-hero-title">Caption Log</h1>
+  <p class="caption-hero-sub">The running record of this voyage's best lines — for the photos, the moments, and the ones that needed to be written down before everyone forgot.</p>
+</div>
+
+<div class="section">
+
+  <!-- Controls row -->
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:24px;">
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <button class="add-btn" onclick="openModal()">+ Add Caption</button>
+      <span class="count-badge" id="count-badge">0</span>
+    </div>
+    <button class="export-btn" onclick="exportCaptions()">↓ Export All</button>
+  </div>
+
+  <!-- Filter chips -->
+  <div class="feed-controls" id="filter-controls" style="display:none;">
+    <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);">Filter:</span>
+    <button class="filter-chip active" data-filter="all" onclick="setFilter('all', this)">All</button>
+  </div>
+
+  <!-- Feed -->
+  <div class="caption-grid" id="caption-grid"></div>
+  <div class="empty-state" id="empty-state">
+    <div class="empty-state-icon">📸</div>
+    <div class="empty-state-title">No captions yet.</div>
+    <p class="empty-state-sub">Hit <strong>+ Add Caption</strong> to log the first one.<br>They're saved in your browser — anyone on the crew can add their own.</p>
+  </div>
+
+</div>
+
+<!-- Add Caption Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-title">New Caption</div>
+
+    <label class="form-label" for="input-caption">Caption text *</label>
+    <textarea id="input-caption" class="form-textarea" placeholder="The one where Adam tried to explain a gybe to a seagull…" maxlength="400"></textarea>
+
+    <label class="form-label" for="input-context">Photo / moment description</label>
+    <input id="input-context" class="form-input" type="text" placeholder="Sunset from Antipaxos anchorage" maxlength="100" />
+
+    <label class="form-label" for="input-who">Crew member</label>
+    <select id="input-who" class="form-select">
+      <option value="">— choose —</option>
+      <option>Adam</option>
+      <option>Jenny</option>
+      <option>Nick</option>
+      <option>Frank</option>
+      <option>Ashley</option>
+      <option>Kylie</option>
+      <option>other</option>
+    </select>
+
+    <label class="form-label" for="input-date">Date</label>
+    <input id="input-date" class="form-input" type="date" />
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveCaption()">Save Caption</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div>⛵ <strong>Grecian Gusts</strong> · Sunsail 454L · Ionian Sea · June 2026</div>
+  <div style="margin-top:6px;"><a href="/">← Home</a></div>
+</footer>
+
+<script>
+  const STORAGE_KEY = 'gg_captions_v1';
+
+  // ── State ──
+  let captions = load();
+  let activeFilter = 'all';
+
+  // ── Persistence ──
+  function load() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch { return []; }
+  }
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(captions));
+  }
+
+  // ── Modal ──
+  function openModal() {
+    const today = new Date().toISOString().slice(0, 10);
+    document.getElementById('input-date').value = today;
+    document.getElementById('input-caption').value = '';
+    document.getElementById('input-context').value = '';
+    document.getElementById('input-who').value = '';
+    document.getElementById('modal-overlay').classList.add('open');
+    setTimeout(() => document.getElementById('input-caption').focus(), 50);
+  }
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('modal-overlay')) closeModal();
+  }
+
+  // ── Save ──
+  function saveCaption() {
+    const text = document.getElementById('input-caption').value.trim();
+    if (!text) {
+      document.getElementById('input-caption').focus();
+      return;
+    }
+    const entry = {
+      id: Date.now(),
+      text,
+      context: document.getElementById('input-context').value.trim(),
+      who: document.getElementById('input-who').value || 'crew',
+      date: document.getElementById('input-date').value || new Date().toISOString().slice(0, 10),
+    };
+    captions.unshift(entry);
+    save();
+    closeModal();
+    render();
+  }
+
+  // ── Delete ──
+  function deleteCaption(id) {
+    captions = captions.filter(c => c.id !== id);
+    save();
+    render();
+  }
+
+  // ── Filter ──
+  function setFilter(val, btn) {
+    activeFilter = val;
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  }
+
+  // ── Render ──
+  function render() {
+    const grid = document.getElementById('caption-grid');
+    const empty = document.getElementById('empty-state');
+    const badge = document.getElementById('count-badge');
+    const filterControls = document.getElementById('filter-controls');
+
+    // Update filter chips from current crew names
+    updateFilters();
+
+    const filtered = activeFilter === 'all'
+      ? captions
+      : captions.filter(c => c.who === activeFilter);
+
+    badge.textContent = captions.length;
+    filterControls.style.display = captions.length > 1 ? 'flex' : 'none';
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    grid.innerHTML = filtered.map(c => {
+      const d = c.date ? formatDate(c.date) : '';
+      return `
+        <div class="caption-card">
+          <button class="caption-delete" onclick="deleteCaption(${c.id})" title="Delete">✕</button>
+          <div class="caption-text">"${escHtml(c.text)}"</div>
+          <div class="caption-meta">
+            ${c.context ? `<span class="meta-tag tag-location">📍 ${escHtml(c.context)}</span>` : ''}
+            ${c.who && c.who !== 'crew' ? `<span class="meta-tag tag-crew">${escHtml(c.who)}</span>` : ''}
+            ${d ? `<span class="meta-tag tag-date">${d}</span>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function updateFilters() {
+    const names = [...new Set(captions.map(c => c.who).filter(w => w && w !== 'crew'))];
+    const container = document.getElementById('filter-controls');
+    // Remove old crew chips, keep 'All'
+    container.querySelectorAll('[data-filter]:not([data-filter="all"])').forEach(el => el.remove());
+    names.forEach(name => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-chip' + (activeFilter === name ? ' active' : '');
+      btn.dataset.filter = name;
+      btn.textContent = name;
+      btn.onclick = function() { setFilter(name, this); };
+      container.appendChild(btn);
+    });
+  }
+
+  function formatDate(iso) {
+    const [y, m, d] = iso.split('-').map(Number);
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${months[m-1]} ${d}`;
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Export ──
+  function exportCaptions() {
+    if (!captions.length) return;
+    const lines = captions.map((c, i) => {
+      const parts = [`${i + 1}. "${c.text}"`];
+      if (c.context) parts.push(`   📍 ${c.context}`);
+      if (c.who && c.who !== 'crew') parts.push(`   — ${c.who}`);
+      if (c.date) parts.push(`   ${formatDate(c.date)}`);
+      return parts.join('\n');
+    });
+    const blob = new Blob(['Grecian Gusts 2026 · Caption Log\n\n' + lines.join('\n\n')], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'grecian-gusts-captions.txt';
+    a.click();
+  }
+
+  // ── Keyboard shortcut ──
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      if (document.getElementById('modal-overlay').classList.contains('open')) saveCaption();
+    }
+  });
+
+  render();
+</script>
+
+<!-- Cloudflare Web Analytics --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a0fcb96500f347239330201e7253c4f4"}'></script><!-- End Cloudflare Web Analytics -->
+</body>
+</html>
